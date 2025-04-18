@@ -1,0 +1,1021 @@
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background: transparent;
+    color: #fff;
+    overflow: hidden;
+    border-radius: 16px;
+    transition: border-radius 0.3s ease-in-out;
+}
+
+/* Chat Container Styles */
+.chat-container {
+    width: 100%;
+    height: 100%;
+    background: #131620;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+    transition: all 0.4s cubic-bezier(0.3, 0, 0.2, 1);
+    transform-origin: bottom right;
+}
+
+/* Minimized state */
+body.minimized {
+    border-radius: 16px 16px 0 0;
+}
+
+.chat-container.minimized {
+    height: 60px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-radius: 16px 16px 0 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    transform: translateZ(0);
+}
+
+.chat-container.minimized .chat-messages,
+.chat-container.minimized .chat-input-container {
+    display: none;
+    opacity: 0;
+}
+
+.chat-messages, 
+.chat-input-container {
+    opacity: 1;
+    transition: opacity 0.3s ease 0.1s;
+}
+
+.chat-container.minimized .chat-popup-header {
+    border-bottom: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.chat-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #131620;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    -webkit-app-region: drag;
+}
+
+.chat-model {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.model-indicator {
+    font-size: 16px;
+    font-weight: 500;
+    color: #00DCD4;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00DCD4;
+    box-shadow: 0 0 8px rgba(0, 220, 212, 0.5);
+    margin-top: 3px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+/* Processing state - yellow blinking */
+.status-indicator.processing {
+    background: #FFD700;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+    animation: blink-yellow 1s infinite;
+}
+
+/* New message state when minimized - red blinking */
+.chat-container.minimized .status-indicator.new-message {
+    background: #FF5252;
+    box-shadow: 0 0 8px rgba(255, 82, 82, 0.7);
+    animation: blink-red 1s infinite;
+}
+
+/* Custom status indicator styles */
+.status-indicator.n8n-connected {
+    background-color: #00DCD4;
+    box-shadow: 0 0 10px #00DCD4, 0 0 20px rgba(0, 220, 212, 0.5);
+}
+
+.status-indicator.n8n-disconnected {
+    background-color: #9CA3AF;
+    box-shadow: 0 0 10px rgba(156, 163, 175, 0.5);
+}
+
+/* Gemini mode - purple indicator */
+.status-indicator.gemini-mode {
+    background-color: #A78BFA;
+    box-shadow: 0 0 10px #A78BFA, 0 0 20px rgba(167, 139, 250, 0.5);
+}
+
+/* Error state - red indicator */
+.status-indicator.error {
+    background-color: #EF4444;
+    box-shadow: 0 0 10px #EF4444, 0 0 20px rgba(239, 68, 68, 0.5);
+    animation: blink-red 2s infinite;
+}
+
+/* No webhook state - green blinking */
+.status-indicator.no-webhook {
+    animation: blink-green 2s infinite;
+}
+
+/* n8n connected state - blue */
+.status-indicator.n8n-connected {
+    background: #00DCD4;
+    box-shadow: 0 0 8px rgba(0, 220, 212, 0.5);
+}
+
+/* n8n disconnected state - gray */
+.status-indicator.n8n-disconnected {
+    background: #9CA3AF;
+    box-shadow: 0 0 8px rgba(156, 163, 175, 0.5);
+}
+
+@keyframes blink-yellow {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes blink-red {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes blink-green {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+.chat-popup-controls {
+    display: flex;
+    gap: 16px;
+    -webkit-app-region: no-drag;
+}
+
+.control-btn {
+    background: transparent;
+    border: none;
+    color: #9CA3AF;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+    color: #E5E7EB;
+}
+
+/* Make close button icon more prominent */
+.close-btn i {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Style for minimized mic button */
+.minimized-mic-btn {
+    display: none; /* Hidden by default, shown via JS when minimized */
+    color: #9CA3AF; /* Match other buttons' color */
+    font-size: 16px; /* Match other buttons' font size */
+    transition: all 0.2s ease;
+}
+
+.minimized-mic-btn:hover {
+    color: #E5E7EB; /* Match other buttons' hover color */
+}
+
+/* Remove the pulse animation to match other buttons */
+.minimized-mic-btn i {
+    /* animation: pulse 2s infinite; */
+}
+
+/* Mic active state - neon pink indicator with higher specificity to override other states */
+.status-indicator.mic-active,
+.status-indicator.n8n-connected.mic-active, 
+.status-indicator.n8n-disconnected.mic-active,
+.status-indicator.no-webhook.mic-active,
+.status-indicator.processing.mic-active,
+.status-indicator.new-message.mic-active {
+    background: #FF00FF !important; /* Neon pink with !important to override */
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.9) !important;
+    animation: blink-pink 1s infinite !important;
+}
+
+@keyframes blink-pink {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.7;
+        transform: scale(1.2);
+    }
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #131620;
+    margin-bottom: 0;
+}
+
+.message {
+    max-width: 85%;
+    border-radius: 18px;
+    animation: messageAppear 0.2s ease-out;
+    font-size: 16px;
+    line-height: 1.5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.message:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Remove the generic after pseudo-element */
+.message::after {
+    content: none;
+}
+
+/* AI message copy icon - right side */
+.message.system {
+    align-self: flex-start;
+    background: #1F2937;
+    color: #F9FAFB;
+    padding: 16px 20px;
+    margin-right: 30px; /* Space for the copy icon */
+}
+
+.message.system::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    width: 24px;
+    height: 24px;
+    transform: translateY(-50%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='rgba(255, 255, 255, 0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='2' width='8' height='4' rx='1' ry='1'%3E%3C/rect%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message.system:hover::before {
+    opacity: 0.7;
+}
+
+.message.system.copied::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='%2300DCD4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    opacity: 1;
+    animation: fadeIconOut 1.5s forwards;
+}
+
+/* User message copy icon - left side */
+.message.user {
+    align-self: flex-end;
+    background: #1F2B47;
+    color: #F9FAFB;
+    padding: 16px 20px;
+    margin-left: 30px; /* Space for the copy icon */
+}
+
+.message.user::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    width: 24px;
+    height: 24px;
+    transform: translateY(-50%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='rgba(255, 255, 255, 0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='2' width='8' height='4' rx='1' ry='1'%3E%3C/rect%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message.user:hover::before {
+    opacity: 0.7;
+}
+
+.message.user.copied::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='%2300DCD4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    opacity: 1;
+    animation: fadeIconOut 1.5s forwards;
+}
+
+/* Make sure the typing indicator doesn't show copy icon */
+.message.typing::before {
+    content: none;
+}
+
+.chat-input-container {
+    padding: 16px;
+    background: #131620;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    gap: 12px;
+    padding-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.chat-input {
+    flex: 1;
+    background: #1F2937;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 28px;
+    padding: 14px 20px;
+    color: #F3F4F6;
+    font-size: 15px;
+    resize: none;
+    height: 50px;
+    max-height: 50px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    line-height: 1.4;
+}
+
+.chat-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.chat-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Style for the send/mic button */
+.send-btn {
+    background: #1F2937;
+    border: 1px solid rgba(0, 220, 212, 0.3);
+    border-radius: 50%;
+    color: #00DCD4;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.send-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0, 220, 212, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.send-btn:hover {
+    background: #1F2937;
+    border-color: rgba(0, 220, 212, 0.7);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 220, 212, 0.15);
+}
+
+.send-btn:hover::before {
+    opacity: 1;
+}
+
+.send-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 220, 212, 0.1);
+}
+
+.send-btn i {
+    font-size: 18px;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+    transition: all 0.25s ease;
+}
+
+.send-btn:hover i {
+    color: #20E0D8;
+    filter: none;
+}
+
+/* Style for the recording indicator */
+.send-btn .fa-circle {
+    color: #00DCD4 !important; /* Teal color to match app theme */
+    animation: pulse 1.5s infinite !important;
+    filter: drop-shadow(0 0 5px rgba(0, 220, 212, 0.7)) !important;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Settings Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background: #131620;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    margin: 5% auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: modalFadeIn 0.3s ease-out;
+    overflow-y: auto;
+}
+
+/* Improved scrollbar styling for the modal */
+.modal-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 220, 212, 0.3);
+    border-radius: 2px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 220, 212, 0.5);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #9CA3AF;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-modal:hover {
+    color: #00DCD4;
+}
+
+.modal-content h2 {
+    color: #F9FAFB;
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 22px;
+    font-weight: 500;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+#n8n-settings-form .form-group {
+    margin-bottom: 24px;
+    background: rgba(31, 41, 55, 0.3);
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+#n8n-settings-form .form-group:hover {
+    background: rgba(31, 41, 55, 0.5);
+    border-color: rgba(0, 220, 212, 0.1);
+}
+
+#n8n-settings-form label {
+    display: block;
+    margin-bottom: 10px;
+    color: #F9FAFB;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#n8n-settings-form input,
+#n8n-settings-form select {
+    width: 100%;
+    padding: 14px;
+    background: #1F2937;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #F9FAFB;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#n8n-settings-form input:focus,
+#n8n-settings-form select:focus {
+    background: #1F2937;
+    border-color: #00DCD4;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 220, 212, 0.2);
+}
+
+#n8n-settings-form small {
+    display: block;
+    margin-top: 8px;
+    color: #9CA3AF;
+    font-size: 13px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+#n8n-settings-form button {
+    flex: 1;
+    padding: 14px;
+    background: #1F2937;
+    border: 1px solid rgba(0, 220, 212, 0.3);
+    border-radius: 10px;
+    color: #00DCD4;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.5px;
+}
+
+#n8n-settings-form button:hover {
+    background: #252D3A;
+    border-color: rgba(0, 220, 212, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 220, 212, 0.15);
+    transform: translateY(-2px);
+}
+
+#n8n-settings-form button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.test-btn {
+    background: #1F2937 !important;
+}
+
+.test-btn:hover {
+    background: #252D3A !important;
+}
+
+.test-result {
+    margin-top: 16px;
+    min-height: 24px;
+    text-align: center;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.test-result .error {
+    color: #FF5252;
+    background: rgba(255, 82, 82, 0.1);
+    padding: 8px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.test-result .success {
+    color: #00DCD4;
+    background: rgba(0, 220, 212, 0.1);
+    padding: 8px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.test-result .pending {
+    color: #FFD700;
+    background: rgba(255, 215, 0, 0.1);
+    padding: 8px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.helper-text {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(31, 41, 55, 0.5);
+    border-radius: 8px;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.helper-text p {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.helper-text ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.helper-text li {
+    margin-bottom: 4px;
+}
+
+.helper-text strong {
+    color: #00DCD4;
+}
+
+/* Animations */
+@keyframes messageAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Add styles for the typing indicator */
+.message.typing {
+    max-width: 80px;
+    cursor: default;
+    background: #1F2937;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message.typing:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.message.typing::after {
+    content: none;
+}
+
+.message.typing p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modern loading animation */
+.typing-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 24px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(to right, #00DCD4, #4F7FFF);
+    animation: typingAnimation 1.4s infinite;
+    transform-origin: center;
+    opacity: 0.7;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingAnimation {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.6;
+        box-shadow: 0 0 0 rgba(0, 220, 212, 0);
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(0, 220, 212, 0.5);
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0.6;
+        box-shadow: 0 0 0 rgba(0, 220, 212, 0);
+    }
+}
+
+/* Style for settings button */
+.settings-btn {
+    position: relative;
+}
+
+.settings-btn i {
+    transition: transform 0.3s ease;
+}
+
+.settings-btn:hover i {
+    transform: rotate(30deg);
+}
+
+/* Styles for the test webhook button and results */
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.test-btn {
+    background: #30363D;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.test-btn:hover {
+    background: #3C444D;
+}
+
+.test-result {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.test-result .error {
+    color: #FF5252;
+}
+
+.test-result .success {
+    color: #4CAF50;
+}
+
+.test-result .pending {
+    color: #FFC107;
+}
+
+/* Helper text for troubleshooting */
+.helper-text {
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #00DCD4;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.helper-text p {
+    margin-bottom: 6px;
+    color: #DDD;
+}
+
+.helper-text ul {
+    padding-left: 16px;
+    color: #BBB;
+}
+
+.helper-text li {
+    margin-bottom: 4px;
+}
+
+.helper-text strong {
+    color: #00DCD4;
+}
+
+/* Animation for maximizing */
+@keyframes maximizeEffect {
+    0% {
+        opacity: 0.7;
+        transform: scale(0.98);
+    }
+    50% {
+        transform: scale(1.01);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Apply the animation when container is not minimized */
+.chat-container:not(.minimized) {
+    animation: maximizeEffect 0.4s forwards;
+}
+
+@keyframes fadeIconOut {
+    0% {
+        opacity: 1;
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Ensure minimize button matches other control buttons */
+.minimize-btn {
+    background: transparent !important;
+    border: none !important;
+    color: #9CA3AF !important;
+}
+
+.minimize-btn:hover {
+    color: #E5E7EB !important;
+}
+
+.minimize-btn i {
+    font-size: 18px;
+}
+
+/* Toggle Switch for API Selection */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.toggle-checkbox {
+    height: 0;
+    width: 0;
+    opacity: 0;
+    position: absolute;
+}
+
+.toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    background: #1F2937;
+    border-radius: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.toggle-label:after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    background: #9CA3AF;
+    transition: all 0.3s ease;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+    background: #1F2937;
+    border-color: rgba(0, 220, 212, 0.5);
+}
+
+.toggle-checkbox:checked + .toggle-label:after {
+    background: #00DCD4;
+    transform: translateX(24px);
+}
+
+#api-label {
+    font-size: 14px;
+    color: #DDD;
+}
+
+/* Message content styling */
+.message p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.message p strong {
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Bullet points inside messages */
+.message p {
+    white-space: pre-wrap;
+}
+
+/* Add some space after bullet points for better readability */
+.message p br + br {
+    display: block;
+    margin-top: 8px;
+    content: "";
+} 

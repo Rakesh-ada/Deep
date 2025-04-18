@@ -1,19 +1,18 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
 # Dependency directories
 node_modules/
-jspm_packages/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
 
 # Build output
 dist/
 build/
 out/
+release/
+*.exe
+*.dmg
+*.app
+*.zip
 
 # Environment variables
 .env
@@ -22,35 +21,27 @@ out/
 .env.test.local
 .env.production.local
 
-# Cache
-.npm
+# Cache directories
+.cache/
+.npm/
 .eslintcache
-.cache
-.parcel-cache
-
-# Coverage directory
-coverage/
-
-# macOS specific
 .DS_Store
 
-# Windows specific
-Thumbs.db
-desktop.ini
-
-# Editor directories and files
+# Editor configs
 .idea/
 .vscode/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.swp
+*.swo
 
-# Electron-builder output
-dist_electron/
+# Application specific
+**/n8n-data/
+**/logs/
+userData/
+ChatAppData/
 
-# Debug files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log* 
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.bak
+*.log 

@@ -1,55 +1,72 @@
 {
-  "name": "deep-the-ai",
+  "name": "deep-ai-chat",
   "version": "1.0.0",
-  "description": "Floating chat interface desktop application using n8n for workflow automation and Google Gemini AI",
+  "description": "A floating chat interface desktop application using n8n",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev",
-    "build": "electron-builder",
-    "postinstall": "node install-dependencies.js",
-    "generate-icon": "node assets/icon.js"
+    "dev": "electron .",
+    "clean": "rimraf dist node_modules/.cache",
+    "build": "electron-builder --win",
+    "build:win": "electron-builder --win",
+    "build:portable": "electron-builder --win portable"
   },
   "keywords": [
-    "AI",
-    "n8n",
-    "Gemini",
+    "electron",
     "chat",
-    "automation"
+    "ai",
+    "n8n"
   ],
   "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@google/generative-ai": "^0.2.0",
-    "axios": "^1.6.5",
-    "canvas": "^2.11.2",
-    "electron-store": "^8.1.0",
-    "n8n": "^1.9.0",
-    "node-fetch": "^3.3.2",
-    "sqlite3": "^5.1.6"
-  },
+  "license": "ISC",
   "devDependencies": {
-    "electron": "^29.0.0",
+    "electron": "^28.0.0",
     "electron-builder": "^24.9.1"
   },
   "build": {
-    "appId": "com.deeptheai.app",
-    "productName": "Deep The AI",
-    "mac": {
-      "category": "public.app-category.productivity"
+    "appId": "com.chat.floatingapp",
+    "productName": "Deep AI Chat",
+    "directories": {
+      "output": "dist"
     },
+    "files": [
+      "*.js",
+      "*.html",
+      "*.css",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules",
+        "to": "app/node_modules",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/**/*"
+    ],
     "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ]
+      "target": "nsis",
+      "artifactName": "${productName}-${version}.${ext}"
     },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "category": "Utility"
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
     }
+  },
+  "dependencies": {
+    "@google-cloud/speech": "^7.0.1",
+    "@google/generative-ai": "^0.2.1",
+    "googleapis": "^148.0.0",
+    "n8n": "^1.30.1",
+    "node-fetch": "^2.7.0",
+    "sqlite3": "^5.1.7"
   }
-} 
+}
