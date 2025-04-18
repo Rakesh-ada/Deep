@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep The AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Title Bar -->
+    <div class="title-bar">
+      <div class="title-bar-left">
+        <div class="app-title">Deep The AI</div>
+        <div id="connection-status" class="connection-status">
+          <div class="status-indicator"></div>
+          <span class="status-text">Connecting...</span>
+        </div>
+      </div>
+      <div class="title-bar-controls">
+        <button id="settings-btn" class="control-btn settings-btn" title="Settings">
+          <i class="fas fa-cog"></i>
+        </button>
+        <button id="minimize-btn" class="control-btn" title="Minimize">
+          <i class="fas fa-minus"></i>
+        </button>
+        <button id="expand-btn" class="control-btn" title="Expand">
+          <i class="fas fa-expand"></i>
+        </button>
+        <button id="close-btn" class="control-btn" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Chat Messages Container -->
+      <div id="chat-container" class="chat-container">
+        <!-- Messages will be added here dynamically -->
+        <div class="message bot-message">
+          <div class="message-content">
+            <p>Hello! I'm Deep AI. How can I assist you today?</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-area">
+        <textarea id="user-input" placeholder="Type your message..." rows="1"></textarea>
+        <div class="input-controls">
+          <button id="voice-btn" class="control-btn voice-btn" title="Voice Input">
+            <i class="fas fa-microphone"></i>
+          </button>
+          <button id="send-btn" class="control-btn send-btn" title="Send">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Panel (hidden by default) -->
+    <div id="settings-panel" class="settings-panel hidden">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button id="close-settings-btn" class="control-btn" title="Close Settings">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="settings-content">
+        <div class="settings-section">
+          <h3>AI Backend</h3>
+          <div class="setting-item">
+            <label for="n8n-enabled">Enable n8n Integration</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="n8n-enabled" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <label for="n8n-webhook">n8n Webhook URL</label>
+            <input type="text" id="n8n-webhook" placeholder="http://localhost:5678/webhook/my-endpoint">
+          </div>
+          <div class="setting-item">
+            <label for="n8n-editor-btn">n8n Editor</label>
+            <button id="n8n-editor-btn" class="button">Open Editor</button>
+          </div>
+          <div class="setting-item">
+            <label for="use-gemini">Use Gemini as Fallback</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="use-gemini" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Voice Settings</h3>
+          <div class="setting-item">
+            <label for="voice-enabled">Enable Voice Features</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="voice-enabled" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <label for="voice-gender">Voice Gender</label>
+            <select id="voice-gender">
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Appearance</h3>
+          <div class="setting-item">
+            <label for="theme-selector">Theme</label>
+            <select id="theme-selector">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="settings-footer">
+        <button id="save-settings-btn" class="button primary-button">Save Settings</button>
+      </div>
+    </div>
+
+    <!-- Voice Recording Indicator (hidden by default) -->
+    <div id="voice-indicator" class="voice-indicator hidden">
+      <div class="voice-animation">
+        <div class="voice-bar"></div>
+        <div class="voice-bar"></div>
+        <div class="voice-bar"></div>
+        <div class="voice-bar"></div>
+        <div class="voice-bar"></div>
+      </div>
+      <div class="voice-text">Listening...</div>
+      <button id="stop-voice-btn" class="control-btn" title="Stop Recording">
+        <i class="fas fa-stop"></i>
+      </button>
+    </div>
+
+    <!-- Loading Indicator (hidden by default) -->
+    <div id="loading-indicator" class="loading-indicator hidden">
+      <div class="loading-animation">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </div>
+      <div class="loading-text">Thinking...</div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="utils/gemini-client.js"></script>
+  <script src="utils/n8n-client.js"></script>
+  <script src="utils/speech-utils.js"></script>
+  <script src="components/chat.js"></script>
+  <script src="components/settings.js"></script>
+  <script src="components/voice-input.js"></script>
+  <script src="main.js"></script>
+</body>
+</html> 

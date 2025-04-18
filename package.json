@@ -1,0 +1,55 @@
+{
+  "name": "deep-the-ai",
+  "version": "1.0.0",
+  "description": "Floating chat interface desktop application using n8n for workflow automation and Google Gemini AI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "postinstall": "node install-dependencies.js",
+    "generate-icon": "node assets/icon.js"
+  },
+  "keywords": [
+    "AI",
+    "n8n",
+    "Gemini",
+    "chat",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.2.0",
+    "axios": "^1.6.5",
+    "canvas": "^2.11.2",
+    "electron-store": "^8.1.0",
+    "n8n": "^1.9.0",
+    "node-fetch": "^3.3.2",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.deeptheai.app",
+    "productName": "Deep The AI",
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility"
+    }
+  }
+} 
