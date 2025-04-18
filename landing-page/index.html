@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deep AI Chat — Floating AI Assistant</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <!-- Background Elements -->
+  <div class="bg-grid"></div>
+  
+  
+  <header>
+    <nav class="navbar">
+      <div class="logo">Deep AI Chat</div>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">Installation</a></li>
+        <li><a href="#about">Technology</a></li>
+        <li><a href="#contact">Download</a></li>
+        <li><a href="https://github.com/Rakesh-ada/Deep.git" target="_blank">GitHub <i class="fab fa-github"></i></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="home" class="landing">
+    <div class="landing-content">
+      <h1>Deep AI Chat</h1>
+      <p>A Floating Chat Interface with Dual AI Backends</p>
+      <a href="#about" class="btn">Explore <i class="fas fa-arrow-right"></i></a>
+      
+      <!-- Floating mockup image -->
+      <div class="mockup">
+        <div class="mockup-window">
+          <div class="window-controls">
+            <span class="control-red"></span>
+            <span class="control-yellow"></span>
+            <span class="control-green"></span>
+          </div>
+          <div class="mockup-header">
+            <div class="mockup-title">Deep AI Chat</div>
+            <div class="mockup-buttons">
+              <span class="mockup-button"><i class="fas fa-cog"></i></span>
+              <span class="mockup-button"><i class="fas fa-volume-up"></i></span>
+              <span class="mockup-button"><i class="fas fa-minus"></i></span>
+            </div>
+          </div>
+          <div class="chat-interface">
+            <div class="message received" data-time="10:42 AM">How can I use n8n with this application?</div>
+            <div class="message sent" data-time="10:43 AM">Deep AI Chat can connect to n8n automatically. Just configure your webhook URL in settings, and the app will detect and connect to your n8n workflows. If n8n isn't running, the app will fall back to using Google Gemini AI.</div>
+            <div class="message received" data-time="10:45 AM">Can I use voice commands?</div>
+            <div class="message typing">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+          <div class="chat-input">
+            <button class="voice-button"><i class="fas fa-microphone"></i></button>
+            <input type="text" placeholder="Type your message here...">
+            <button class="send-button"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="section">
+    <div class="section-header">
+      <div class="accent-line"></div>
+      <h2>Intelligent Assistant</h2>
+      <p class="section-subtitle">Always accessible, always on top of your workflow</p>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-text-container">
+        <div class="about-callout">
+          <div class="callout-icon">
+            <i class="fas fa-quote-left"></i>
+          </div>
+          <h3 class="callout-title">Need an answer while working?</h3>
+          <p class="callout-description">Deep AI Chat stays with you across all applications</p>
+        </div>
+        
+        <p class="about-description">
+          Deep AI Chat features a floating window that remains accessible while you use other applications. With dual AI backends (n8n workflows and Google Gemini), it ensures you always have intelligent assistance just a click away.
+        </p>
+        
+        <div class="about-stats">
+          <div class="stat-item">
+            <span class="stat-number">2</span>
+            <span class="stat-label">AI Backends</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Platforms Supported</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Always Available</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="about-visual">
+        <div class="visual-bg"></div>
+        <div class="platform-icons">
+          <div class="platform-icon whatsapp">
+            <i class="fab fa-windows"></i>
+          </div>
+          <div class="platform-icon linkedin">
+            <i class="fab fa-apple"></i>
+          </div>
+          <div class="platform-icon gmail">
+            <i class="fab fa-linux"></i>
+          </div>
+        </div>
+        <div class="connect-lines"></div>
+        <div class="central-ai">
+          <div class="ai-core">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="ai-pulse"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section dark">
+    <div class="section-header">
+      <div class="accent-line"></div>
+    <h2>Key Features</h2>
+      <p class="section-subtitle">Advanced capabilities to enhance your productivity</p>
+    </div>
+    
+    <div class="features-grid">
+      <div class="feature-card" data-icon="fa-window-restore">
+        <div class="feature-card-inner">
+          <div class="feature-card-front">
+            <div class="feature-icon"><i class="fas fa-window-restore"></i></div>
+            <h3>Floating Interface</h3>
+          </div>
+          <div class="feature-card-back">
+            <p>Always-on-top chat interface that stays accessible while using other applications</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card" data-icon="fa-history">
+        <div class="feature-card-inner">
+          <div class="feature-card-front">
+            <div class="feature-icon"><i class="fas fa-history"></i></div>
+            <h3>Message History</h3>
+          </div>
+          <div class="feature-card-back">
+            <p>Stores your conversation for context and reference with easy copy functionality</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card" data-icon="fa-microphone">
+        <div class="feature-card-inner">
+          <div class="feature-card-front">
+            <div class="feature-icon"><i class="fas fa-microphone"></i></div>
+            <h3>Voice Capabilities</h3>
+          </div>
+          <div class="feature-card-back">
+            <p>Record and transcribe voice inputs with Google's Speech-to-Text API</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card" data-icon="fa-cogs">
+        <div class="feature-card-inner">
+          <div class="feature-card-front">
+            <div class="feature-icon"><i class="fas fa-cogs"></i></div>
+            <h3>Dual AI Backend</h3>
+          </div>
+          <div class="feature-card-back">
+            <p>Connect to custom n8n workflows or use Google's Gemini AI with smart failover</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card" data-icon="fa-volume-up">
+        <div class="feature-card-inner">
+          <div class="feature-card-front">
+            <div class="feature-icon"><i class="fas fa-volume-up"></i></div>
+            <h3>Text-to-Speech</h3>
+          </div>
+          <div class="feature-card-back">
+            <p>AI responses can be read aloud with natural-sounding voice in male or female options</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card" data-icon="fa-sliders-h">
+        <div class="feature-card-inner">
+          <div class="feature-card-front">
+            <div class="feature-icon"><i class="fas fa-sliders-h"></i></div>
+            <h3>Advanced Settings</h3>
+          </div>
+          <div class="feature-card-back">
+            <p>Simple UI for configuring all aspects of the application with connection testing</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="section">
+    <div class="section-header">
+      <div class="accent-line"></div>
+    <h2>How It Works</h2>
+      <p class="section-subtitle">Simple steps to get started with Deep AI Chat</p>
+    </div>
+    
+    <div class="workflow-container">
+     
+      
+      <div class="steps-container">
+        <div class="step-card clean" data-step="1">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-icon">
+              <i class="fas fa-download"></i>
+            </div>
+            <h3>Install</h3>
+            <p>Run the installer script to set up all dependencies automatically</p>
+          </div>
+        </div>
+        
+        <div class="step-card clean" data-step="2">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-icon">
+              <i class="fas fa-play"></i>
+            </div>
+            <h3>Launch</h3>
+            <p>Start the application with a simple command or executable</p>
+          </div>
+        </div>
+        
+        <div class="step-card clean" data-step="3">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <h3>Configure</h3>
+            <p>Set up your n8n webhook or use the default Gemini AI backend</p>
+          </div>
+        </div>
+        
+        <div class="step-card clean" data-step="4">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-icon">
+              <i class="fas fa-comment"></i>
+            </div>
+            <h3>Chat</h3>
+            <p>Enjoy intelligent conversations with voice support across all your apps</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="workflow-line"></div>
+    </div>
+  </section>
+
+  <section id="contact" class="section dark">
+    <div class="section-header">
+      <div class="accent-line"></div>
+      <h2>Get Started</h2>
+      <p class="section-subtitle">Download Deep AI Chat and transform your productivity</p>
+    </div>
+    
+    <div class="grid-container">
+      <div class="text-content">
+        <h3>System Requirements</h3>
+        <ul>
+          <li>Node.js (version 16 or higher)</li>
+          <li>Windows, macOS, or Linux operating system</li>
+          <li>Internet connection for AI services</li>
+        </ul>
+        
+        <h3>Installation Options</h3>
+        <p>Choose the installation method that works best for you:</p>
+        <ol>
+          <li>Windows: Double-click the <code>install.bat</code> file</li>
+          <li>macOS/Linux: Run <code>./install.sh</code> in terminal</li>
+          <li>Manual: Run <code>node install-dependencies.js</code></li>
+        </ol>
+        
+        <div class="btn-container">
+          <a href="https://github.com/Rakesh-ada/Deep.git" class="btn">
+            <i class="fab fa-github"></i> Download from GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <h3>Deep AI Chat</h3>
+        <p>Intelligent assistance anywhere</p>
+      </div>
+      <div class="social-links">
+        <a href="https://github.com/Rakesh-ada/Deep.git" class="social-icon" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="mailto:contact@deepaichat.com" class="social-icon"><i class="fas fa-envelope"></i></a>
+        <a href="#" class="social-icon"><i class="fas fa-globe"></i></a>
+      </div>
+    </div>
+    <div class="copyright">
+      &copy; 2024 Deep AI Chat. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/gsap@3.11.5/dist/gsap.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.11.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.11.5/dist/ScrollToPlugin.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
