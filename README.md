@@ -100,11 +100,17 @@ The installation scripts will ensure all required dependencies are installed:
 
 ## Running the Application
 
-After installation, you can run the application with:
+After installation, simply run the application with:
 
-```
+```bash
 npm start
 ```
+
+This command will:
+1. Check for and install any missing dependencies
+2. Verify if n8n is installed and install it if needed
+3. Start n8n in the background (if not already running)
+4. Launch the chat interface
 
 ## Building the Application
 

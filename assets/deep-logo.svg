@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .logo-text {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 48px;
+      fill: #00DCD4; /* Turquoise blue to match the indicator */
+    }
+    .logo-circle {
+      fill: #00DCD4;
+      opacity: 0.2;
+    }
+  </style>
+  <circle class="logo-circle" cx="100" cy="100" r="90" />
+  <text class="logo-text" x="100" y="115" text-anchor="middle">DEEP</text>
+</svg>

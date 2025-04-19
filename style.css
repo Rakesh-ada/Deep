@@ -406,12 +406,12 @@ body.minimized {
     width: 50px;
     height: 50px;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     position: relative;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 }
 
@@ -451,7 +451,7 @@ body.minimized {
 }
 
 .send-btn:hover i {
-    color: #20E0D8;
+    color: #00DCD4;
     filter: none;
 }
 
@@ -861,7 +861,7 @@ body.minimized {
 }
 
 .test-result .success {
-    color: #4CAF50;
+    color: #00DCD4;
 }
 
 .test-result .pending {

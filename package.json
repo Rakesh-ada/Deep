@@ -9,9 +9,7 @@
     "clean": "rimraf dist node_modules/.cache",
     "build": "electron-builder --win",
     "build:win": "electron-builder --win",
-    "build:portable": "electron-builder --win portable --dir",
-    "build:simple": "electron-builder --win portable --dir",
-    "postinstall": "electron-builder install-app-deps"
+    "build:portable": "electron-builder --win portable"
   },
   "keywords": [
     "electron",
@@ -32,19 +30,11 @@
       "output": "dist"
     },
     "files": [
-      "main.js",
-      "preload.js",
-      "index.html",
-      "style.css",
+      "*.js",
+      "*.html",
+      "*.css",
       "assets/**/*",
-      "node_modules/**/*",
-      "!landing-page/**/*",
-      "!install-dependencies.js",
-      "!install-electron.js",
-      "!install.bat",
-      "!install.sh",
-      "!README.md",
-      "!LICENSE"
+      "node_modules/**/*"
     ],
     "extraResources": [
       {
@@ -59,26 +49,13 @@
       "node_modules/**/*"
     ],
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "artifactName": "${productName}-Setup-${version}.${ext}"
+      "target": "nsis",
+      "artifactName": "${productName}-${version}.${ext}"
     },
     "nsis": {
-      "oneClick": true,
-      "perMachine": false,
+      "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Deep AI Chat",
-      "installerIcon": "assets/deep.ico",
-      "uninstallerIcon": "assets/deep.ico",
-      "installerHeaderIcon": "assets/deep.ico"
+      "createDesktopShortcut": true
     },
     "portable": {
       "artifactName": "${productName}-Portable-${version}.${ext}"
@@ -87,7 +64,7 @@
   "dependencies": {
     "@google-cloud/speech": "^7.0.1",
     "@google/generative-ai": "^0.2.1",
-    "n8n": "^1.30.1",
+    "googleapis": "^148.0.0",
     "node-fetch": "^2.7.0",
     "sqlite3": "^5.1.7"
   }

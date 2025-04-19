@@ -193,9 +193,6 @@
         console.log('Checking n8n status...');
         const statusIndicator = document.querySelector('.status-indicator');
         
-        // Add initial loading message
-        addMessage('Starting up and connecting to backend...', false);
-        
         // Try to check n8n status
         const n8nStatus = await window.electronAPI.checkN8nStatus();
         console.log('n8n status:', n8nStatus);
@@ -203,8 +200,10 @@
         // Check if n8n is running
         if (n8nStatus.running) {
           // n8n is running
+          statusIndicator.classList.remove('n8n-disconnected', 'gemini-mode', 'no-webhook');
           statusIndicator.classList.add('n8n-connected');
-          
+          statusIndicator.style.background = '#00DCD4'; // Turquoise color to match Deep logo
+          statusIndicator.style.boxShadow = '0 0 10px #00DCD4, 0 0 20px rgba(0, 220, 212, 0.5)';
           // Now check if webhook is configured
           const settings = JSON.parse(localStorage.getItem('n8nSettings') || '{}');
           if (!settings.url) {
@@ -215,14 +214,19 @@
         } else if (n8nStatus.useGemini) {
           // Using Gemini API
           console.log('Using Gemini API');
+          statusIndicator.classList.remove('n8n-connected', 'n8n-disconnected', 'no-webhook');
           statusIndicator.classList.add('gemini-mode');
-          // Show welcome message with Deep AI info
+          statusIndicator.style.background = '';
+          statusIndicator.style.boxShadow = '';
+          // Show welcome message with Gemini info
           const welcomeMsg = 'Welcome to Deep AI Chat! n8n is not available, so I\'m using advanced AI to assist you. You can chat directly without n8n.';
           addMessage(welcomeMsg, false);
         } else {
           // n8n is not running
-          console.log('n8n is not running');
+          statusIndicator.classList.remove('n8n-connected', 'gemini-mode', 'no-webhook');
           statusIndicator.classList.add('n8n-disconnected');
+          statusIndicator.style.background = '';
+          statusIndicator.style.boxShadow = '';
         }
       } catch (error) {
         console.error('Error checking n8n status:', error);
@@ -252,6 +256,8 @@
       // Update indicator to show n8n is connected
       statusIndicator.classList.remove('n8n-disconnected');
       statusIndicator.classList.add('n8n-connected');
+      statusIndicator.style.background = '#00DCD4'; // Turquoise color to match Deep logo
+      statusIndicator.style.boxShadow = '0 0 10px #00DCD4, 0 0 20px rgba(0, 220, 212, 0.5)';
       
       // Check if webhook is configured
       const savedSettings = localStorage.getItem('n8nSettings');
@@ -285,6 +291,8 @@
       const statusIndicator = document.querySelector('.status-indicator');
       statusIndicator.classList.remove('n8n-connected', 'n8n-disconnected', 'no-webhook', 'processing');
       statusIndicator.classList.add('gemini-mode');
+      statusIndicator.style.background = '';
+      statusIndicator.style.boxShadow = '';
       
       // Show welcome message with Gemini info
       const welcomeMsg = 'Welcome to Deep AI Chat! n8n is not available, so I\'m using advanced AI to assist you. You can chat directly without n8n.';
@@ -1132,7 +1140,7 @@
           // Restore appropriate status
           restoreStatusIndicator();
           
-          // Directly send the recognized text
+          // Directly send recognized text instead of showing in input
           if (transcript.trim() !== '') {
             // Add user message to chat
             addMessage(transcript, true);
@@ -1284,7 +1292,7 @@
             'Accept': 'application/json'
           },
           body: JSON.stringify({ message: "Test message from chat app" }),
-          mode: 'cors',
+          mode: 'cors',  // Try with CORS mode
           cache: 'no-cache'
         }).catch(error => {
           console.error('Network test error:', error);
@@ -1300,23 +1308,23 @@
           if (Array.isArray(data) && data.length > 0) {
             console.log('Test response is an array, first item:', data[0]);
           }
-          
-          testResult.innerHTML = '<span class="success">Connection successful! ✓</span>';
-          console.log('Webhook test successful:', data);
-        } else {
-          console.error('Test response not OK:', {
-            status: response.status,
-            statusText: response.statusText,
-            url: response.url
-          });
-          
-          testResult.innerHTML = `<span class="error">Error ${response.status}: ${response.statusText}</span>`;
-        }
-      } catch (error) {
-        testResult.innerHTML = `<span class="error">Connection failed: ${error.message}</span>`;
-        console.error('Webhook test error:', error);
+        
+        testResult.innerHTML = '<span class="success">Connection successful! ✓</span>';
+        console.log('Webhook test successful:', data);
+      } else {
+        console.error('Test response not OK:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url
+        });
+        
+        testResult.innerHTML = `<span class="error">Error ${response.status}: ${response.statusText}</span>`;
       }
-    });
+    } catch (error) {
+      testResult.innerHTML = `<span class="error">Connection failed: ${error.message}</span>`;
+      console.error('Webhook test error:', error);
+    }
+  });
 
     // Add event listener for minimized mic button
     minimizedMicBtn.addEventListener('click', () => {
@@ -1684,9 +1692,13 @@
       if (savedSettings && JSON.parse(savedSettings).url) {
         statusIndicator.classList.remove('no-webhook');
         statusIndicator.classList.add('n8n-connected');
+        statusIndicator.style.background = '#00DCD4'; // Turquoise color to match Deep logo
+        statusIndicator.style.boxShadow = '0 0 10px #00DCD4, 0 0 20px rgba(0, 220, 212, 0.5)';
       } else {
         statusIndicator.classList.remove('n8n-connected');
         statusIndicator.classList.add('n8n-disconnected');
+        statusIndicator.style.background = '';
+        statusIndicator.style.boxShadow = '';
       }
     }
 
@@ -1711,6 +1723,8 @@
         // n8n is not installed
         statusIndicator.classList.remove('n8n-connected', 'n8n-disconnected');
         statusIndicator.classList.add('gemini-mode');
+        statusIndicator.style.background = '';
+        statusIndicator.style.boxShadow = '';
         
         // Update the model indicator text
         const modelIndicator = document.querySelector('.model-indicator');
@@ -1739,4 +1753,4 @@
     });
   </script>
 </body>
-</html> 
+</html>
