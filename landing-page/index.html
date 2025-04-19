@@ -3,89 +3,93 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Deep AI Chat — Floating AI Assistant</title>
+  <title>Deep AI — A Glowing Flame on your Desktop</title>
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="chat-demo.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="icon" href="images/deep-ai-logo.svg" type="image/svg+xml">
+  <meta name="description" content="Deep AI - A floating chat interface desktop application using n8n for workflow automation and Google Gemini AI.">
 </head>
 <body>
   <!-- Background Elements -->
   <div class="bg-grid"></div>
   
+  
   <header>
     <nav class="navbar">
-      <div class="logo">Deep AI Chat</div>
+      <div class="logo">Deep AI</div>
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
       <ul class="nav-links">
-        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
         <li><a href="#features">Features</a></li>
-        <li><a href="#how">Installation</a></li>
-        <li><a href="#about">Technology</a></li>
-        <li><a href="#contact">Download</a></li>
-        <li><a href="https://github.com/Rakesh-ada/Deep.git" target="_blank">GitHub <i class="fab fa-github"></i></a></li>
+        <li><a href="#how">How it Works</a></li>
+        <li><a href="#chat">Templates</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
   </header>
 
   <section id="home" class="landing">
     <div class="landing-content">
-      <h1>Deep AI Chat</h1>
-      <p>A Floating Chat Interface with Dual AI Backends</p>
-      <a href="#about" class="btn">Explore <i class="fas fa-arrow-right"></i></a>
-      
-      <!-- Floating mockup image -->
-      <div class="mockup">
-        <div class="mockup-window">
-          <div class="window-controls">
-            <span class="control-red"></span>
-            <span class="control-yellow"></span>
-            <span class="control-green"></span>
-          </div>
-          <div class="mockup-header">
-            <div class="mockup-title">Deep AI Chat</div>
-            <div class="mockup-buttons">
-              <span class="mockup-button"><i class="fas fa-cog"></i></span>
-              <span class="mockup-button"><i class="fas fa-volume-up"></i></span>
-              <span class="mockup-button"><i class="fas fa-minus"></i></span>
-            </div>
-          </div>
-          <div class="chat-interface">
-            <div class="message received" data-time="10:42 AM">How can I use n8n with this application?</div>
-            <div class="message sent" data-time="10:43 AM">Deep AI Chat can connect to n8n automatically. Just configure your webhook URL in settings, and the app will detect and connect to your n8n workflows. If n8n isn't running, the app will fall back to using Google Gemini AI.</div>
-            <div class="message received" data-time="10:45 AM">Can I use voice commands?</div>
-            <div class="message typing">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </div>
-          </div>
-          <div class="chat-input">
-            <button class="voice-button"><i class="fas fa-microphone"></i></button>
-            <input type="text" placeholder="Type your message here...">
-            <button class="send-button"><i class="fas fa-paper-plane"></i></button>
-          </div>
-        </div>
-      </div>
+      <h1>Deep AI</h1>
+      <p>A Floating Chat Interface Powered by Dual AI Systems</p>
+      <a href="#" class="btn" id="open-chat-btn">Chat with AI </a>
     </div>
   </section>
+
+  <!-- Chat popup interface that appears when clicking "Chat with AI" -->
+  <div id="chat-popup" class="chat-popup">
+    <div class="chat-popup-header">
+      <div class="chat-model">
+        <span class="model-indicator">Deep</span>
+        <span class="status-indicator"></span>
+      </div>
+      <div class="chat-popup-controls">
+        <button id="view-full-chat" class="control-btn" title="View Full Chat"><i class="fas fa-external-link-alt"></i></button>
+        <button id="minimize-chat-popup" class="control-btn" title="Minimize"><i class="fas fa-minus"></i></button>
+        <button id="close-chat-popup" class="control-btn" title="Close"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    
+    <div class="chat-messages">
+      <div class="message system">
+        <div class="message-content">
+          <p>Hi there! I'm Deep, your AI assistant. How can I help you today?</p>
+        </div>
+      </div>
+      <!-- Messages will be added here dynamically -->
+    </div>
+    
+    <div class="chat-input-container">
+      <textarea class="chat-input" placeholder="Ask me anything..." rows="1"></textarea>
+      <button class="send-btn" title="Send message">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
 
   <section id="about" class="section">
     <div class="section-header">
       <div class="accent-line"></div>
-      <h2>Intelligent Assistant</h2>
-      <p class="section-subtitle">Always accessible, always on top of your workflow</p>
+      <h2>AI-Powered Desktop Chat</h2>
+      <p class="section-subtitle">Intelligent assistance always at your fingertips</p>
     </div>
 
     <div class="about-grid">
       <div class="about-text-container">
         <div class="about-callout">
           <div class="callout-icon">
-            <i class="fas fa-quote-left"></i>
+            <i class="fas fa-desktop"></i>
           </div>
-          <h3 class="callout-title">Need an answer while working?</h3>
-          <p class="callout-description">Deep AI Chat stays with you across all applications</p>
+          <h3 class="callout-title">Always accessible, never intrusive</h3>
+          <p class="callout-description">Your AI assistant that's there when you need it</p>
         </div>
         
         <p class="about-description">
-          Deep AI Chat features a floating window that remains accessible while you use other applications. With dual AI backends (n8n workflows and Google Gemini), it ensures you always have intelligent assistance just a click away.
+          Deep AI Chat brings advanced AI capabilities to your desktop with a floating, always-on-top interface. The application intelligently combines n8n workflow automation with Google's Gemini AI for a seamless, powerful experience.
         </p>
         
         <div class="about-stats">
@@ -94,12 +98,12 @@
             <span class="stat-label">AI Backends</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number">3</span>
-            <span class="stat-label">Platforms Supported</span>
+            <span class="stat-number">0</span>
+            <span class="stat-label">Setup Required</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number">100%</span>
-            <span class="stat-label">Always Available</span>
+            <span class="stat-number"><i class="fas fa-bolt"></i></span>
+            <span class="stat-label">Smart Failover</span>
           </div>
         </div>
       </div>
@@ -108,13 +112,22 @@
         <div class="visual-bg"></div>
         <div class="platform-icons">
           <div class="platform-icon whatsapp">
-            <i class="fab fa-windows"></i>
+            <i class="fas fa-robot"></i>
           </div>
           <div class="platform-icon linkedin">
-            <i class="fab fa-apple"></i>
+            <i class="fas fa-microphone"></i>
           </div>
           <div class="platform-icon gmail">
-            <i class="fab fa-linux"></i>
+            <i class="fas fa-volume-up"></i>
+          </div>
+          <div class="platform-icon teams">
+            <i class="fas fa-cog"></i>
+          </div>
+          <div class="platform-icon slack">
+            <i class="fas fa-server"></i>
+          </div>
+          <div class="platform-icon twitter">
+            <i class="fas fa-lock"></i>
           </div>
         </div>
         <div class="connect-lines"></div>
@@ -132,30 +145,40 @@
     <div class="section-header">
       <div class="accent-line"></div>
     <h2>Key Features</h2>
-      <p class="section-subtitle">Advanced capabilities to enhance your productivity</p>
+      <p class="section-subtitle">Everything you need to transform your communication</p>
     </div>
     
     <div class="features-grid">
-      <div class="feature-card" data-icon="fa-window-restore">
+      <div class="feature-card" data-icon="fa-comments">
         <div class="feature-card-inner">
           <div class="feature-card-front">
-            <div class="feature-icon"><i class="fas fa-window-restore"></i></div>
-            <h3>Floating Interface</h3>
+            <div class="feature-icon"><i class="fas fa-comments"></i></div>
+            <h3>Intelligent Chat</h3>
           </div>
           <div class="feature-card-back">
-            <p>Always-on-top chat interface that stays accessible while using other applications</p>
+            <p>Floating, resizable interface that's always accessible while using other apps</p>
+            <div class="feature-platforms">
+              <i class="fas fa-window-maximize"></i>
+              <i class="fas fa-expand-arrows-alt"></i>
+              <i class="fas fa-history"></i>
+            </div>
           </div>
         </div>
       </div>
       
-      <div class="feature-card" data-icon="fa-history">
+      <div class="feature-card" data-icon="fa-robot">
         <div class="feature-card-inner">
           <div class="feature-card-front">
-            <div class="feature-icon"><i class="fas fa-history"></i></div>
-            <h3>Message History</h3>
+            <div class="feature-icon"><i class="fas fa-robot"></i></div>
+            <h3>Dual AI System</h3>
           </div>
           <div class="feature-card-back">
-            <p>Stores your conversation for context and reference with easy copy functionality</p>
+            <p>n8n workflow integration with Gemini 2.0 Flash fallback and smart failover</p>
+            <div class="prompt-bars">
+              <div class="prompt-bar"></div>
+              <div class="prompt-bar"></div>
+              <div class="prompt-bar"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -167,43 +190,62 @@
             <h3>Voice Capabilities</h3>
           </div>
           <div class="feature-card-back">
-            <p>Record and transcribe voice inputs with Google's Speech-to-Text API</p>
+            <p>Speak to your AI with speech recognition and hear responses with text-to-speech</p>
+            <div class="keyboard-shortcut">
+              <span><i class="fas fa-microphone"></i></span>
+              <span>+</span>
+              <span><i class="fas fa-volume-up"></i></span>
+            </div>
           </div>
         </div>
       </div>
       
-      <div class="feature-card" data-icon="fa-cogs">
+      <div class="feature-card" data-icon="fa-cog">
         <div class="feature-card-inner">
           <div class="feature-card-front">
-            <div class="feature-icon"><i class="fas fa-cogs"></i></div>
-            <h3>Dual AI Backend</h3>
+            <div class="feature-icon"><i class="fas fa-cog"></i></div>
+            <h3>Advanced Config</h3>
           </div>
           <div class="feature-card-back">
-            <p>Connect to custom n8n workflows or use Google's Gemini AI with smart failover</p>
+            <p>Customize connection settings, voice options, and appearance preferences</p>
+            <div class="exe-icon">
+              <i class="fas fa-sliders-h"></i>
+              <span>Settings</span>
+            </div>
           </div>
         </div>
       </div>
       
-      <div class="feature-card" data-icon="fa-volume-up">
+      <div class="feature-card" data-icon="fa-code">
         <div class="feature-card-inner">
           <div class="feature-card-front">
-            <div class="feature-icon"><i class="fas fa-volume-up"></i></div>
-            <h3>Text-to-Speech</h3>
+            <div class="feature-icon"><i class="fas fa-code"></i></div>
+            <h3>Developer Friendly</h3>
           </div>
           <div class="feature-card-back">
-            <p>AI responses can be read aloud with natural-sounding voice in male or female options</p>
+            <p>Clean code structure with error handling, logging, and robust IPC</p>
+            <div class="model-icons">
+              <span>n8n</span>
+              <span>Electron</span>
+              <span>Node.js</span>
+            </div>
           </div>
         </div>
       </div>
       
-      <div class="feature-card" data-icon="fa-sliders-h">
+      <div class="feature-card" data-icon="fa-shield-alt">
         <div class="feature-card-inner">
           <div class="feature-card-front">
-            <div class="feature-icon"><i class="fas fa-sliders-h"></i></div>
-            <h3>Advanced Settings</h3>
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3>Security & Privacy</h3>
           </div>
           <div class="feature-card-back">
-            <p>Simple UI for configuring all aspects of the application with connection testing</p>
+            <p>Local processing options with no telemetry and transparent connections</p>
+            <div class="language-icons">
+              <span><i class="fas fa-lock"></i></span>
+              <span><i class="fas fa-user-shield"></i></span>
+              <span><i class="fas fa-server"></i></span>
+            </div>
           </div>
         </div>
       </div>
@@ -214,113 +256,371 @@
     <div class="section-header">
       <div class="accent-line"></div>
     <h2>How It Works</h2>
-      <p class="section-subtitle">Simple steps to get started with Deep AI Chat</p>
+      <p class="section-subtitle">Four simple steps to transform your communication</p>
     </div>
     
     <div class="workflow-container">
+     
+      
       <div class="steps-container">
-        <div class="step-card clean" data-step="1">
-          <div class="step-number">1</div>
+        <div class="step-card clean">
+          <div class="step-number">01</div>
           <div class="step-content">
             <div class="step-icon">
-              <i class="fas fa-download"></i>
+              <i class="fas fa-desktop"></i>
             </div>
-            <h3>Install</h3>
-            <p>Run the installer script to set up all dependencies automatically</p>
+            <h3>Activate Deep AI</h3>
+            <p>Launch the floating chat interface from your system tray or with a keyboard shortcut</p>
           </div>
         </div>
         
-        <div class="step-card clean" data-step="2">
-          <div class="step-number">2</div>
+        <div class="step-card clean">
+          <div class="step-number">02</div>
           <div class="step-content">
             <div class="step-icon">
-              <i class="fas fa-play"></i>
+              <i class="fas fa-comment-dots"></i>
             </div>
-            <h3>Launch</h3>
-            <p>Start the application with a simple command or executable</p>
+            <h3>Ask anything</h3>
+            <p>Type your question or use voice input to communicate with the AI assistant</p>
           </div>
         </div>
         
-        <div class="step-card clean" data-step="3">
-          <div class="step-number">3</div>
+        <div class="step-card clean">
+          <div class="step-number">03</div>
           <div class="step-content">
             <div class="step-icon">
-              <i class="fas fa-cog"></i>
+              <i class="fas fa-brain"></i>
             </div>
-            <h3>Configure</h3>
-            <p>Set up your n8n webhook or use the default Gemini AI backend</p>
+            <h3>Dual AI processing</h3>
+            <p>Your query is processed by our advanced dual AI system with smart failover</p>
           </div>
         </div>
         
-        <div class="step-card clean" data-step="4">
-          <div class="step-number">4</div>
+        <div class="step-card clean">
+          <div class="step-number">04</div>
           <div class="step-content">
             <div class="step-icon">
-              <i class="fas fa-comment"></i>
+              <i class="fas fa-lightbulb"></i>
             </div>
-            <h3>Chat</h3>
-            <p>Enjoy intelligent conversations with voice support across all your apps</p>
+            <h3>Get instant answers</h3>
+            <p>Receive intelligent responses while continuing to work in any application</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="chat" class="section">
+    <div class="section-header">
+      <div class="accent-line"></div>
+      <h2>Agentic Workflow Templates</h2>
+      <p class="section-subtitle">Supercharge your productivity with our pre-built n8n workflows</p>
+    </div>
+    
+    <div class="templates-container">
+      <div class="templates-content">
+        <div class="templates-description">
+          <h3>Ready-to-use AI Automation</h3>
+          <p>Access our library of professionally designed n8n workflow templates that integrate seamlessly with Deep AI. Our templates help you automate complex tasks, connect to popular services, and extend the capabilities of your AI assistant.</p>
+          
+          <div class="template-features">
+            <div class="template-feature">
+              <i class="fas fa-bolt"></i>
+              <span>One-click installation</span>
+            </div>
+            <div class="template-feature">
+              <i class="fas fa-puzzle-piece"></i>
+              <span>Modular components</span>
+            </div>
+            <div class="template-feature">
+              <i class="fas fa-code-branch"></i>
+              <span>Customizable flows</span>
+            </div>
+          </div>
+          
+          <a href="https://n8n-templates.deepai.com" class="btn template-btn">Browse Templates <i class="fas fa-external-link-alt"></i></a>
+        </div>
+        
+        <div class="templates-showcase">
+          <div class="template-card">
+            <div class="template-icon"><i class="fas fa-robot"></i></div>
+            <h4>AI Agent Builder</h4>
+            <p>Create custom AI agents with specific knowledge and capabilities</p>
+          </div>
+          <div class="template-card">
+            <div class="template-icon"><i class="fas fa-database"></i></div>
+            <h4>Data Connector</h4>
+            <p>Connect your AI to databases and external data sources</p>
+          </div>
+          <div class="template-card">
+            <div class="template-icon"><i class="fas fa-calendar-alt"></i></div>
+            <h4>Scheduler</h4>
+            <p>Schedule automated tasks and AI-powered notifications</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="installation" class="section dark">
+    <div class="section-header">
+      <div class="accent-line"></div>
+      <h2>Installation Guide</h2>
+      <p class="section-subtitle">Get started with Deep AI in minutes</p>
+    </div>
+    
+    <div class="installation-container">
+      <div class="installation-tabs">
+        <button class="tab-btn active" data-tab="prerequisites">Prerequisites</button>
+        <button class="tab-btn" data-tab="automatic">Automatic Install</button>
+        <button class="tab-btn" data-tab="manual">Manual Install</button>
+        <button class="tab-btn" data-tab="running">Running</button>
+      </div>
+      
+      <div class="installation-content">
+        <div class="tab-content active" id="prerequisites-tab">
+          <div class="installation-steps">
+            <div class="installation-step">
+              <div class="step-number">1</div>
+              <div class="step-details">
+                <h3>Install Node.js</h3>
+                <p>Deep AI requires Node.js version 16 or higher.</p>
+                <a href="https://nodejs.org/" class="download-btn" target="_blank">Download Node.js <i class="fab fa-node-js"></i></a>
+                <p class="note">npm (Node Package Manager) is included with Node.js installation.</p>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">2</div>
+              <div class="step-details">
+                <h3>Download Deep AI</h3>
+                <p>Download the latest version of Deep AI from our GitHub repository.</p>
+                <a href="https://github.com/Rakesh-ada/Deep" class="download-btn" target="_blank">Download Deep AI <i class="fab fa-github"></i></a>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">3</div>
+              <div class="step-details">
+                <h3>Extract the files</h3>
+                <p>Extract the downloaded zip file to a location of your choice.</p>
+                <p class="note">Make sure you have sufficient permissions for the directory where you extract the files.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="automatic-tab">
+          <div class="installation-steps">
+            <div class="installation-step">
+              <div class="step-number">1</div>
+              <div class="step-details">
+                <h3>Windows Installation</h3>
+                <p>For Windows users, simply double-click the included installation batch file.</p>
+                <div class="code-block">
+                  <pre><code>Double-click install.bat</code></pre>
+                </div>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">2</div>
+              <div class="step-details">
+                <h3>macOS/Linux Installation</h3>
+                <p>For macOS and Linux users, open a terminal in the project directory and run:</p>
+                <div class="code-block">
+                  <pre><code>chmod +x install.sh
+./install.sh</code></pre>
+                </div>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">3</div>
+              <div class="step-details">
+                <h3>Verification</h3>
+                <p>The installer will automatically check and install all required dependencies.</p>
+                <p class="note">The installation includes Electron, n8n, Google Cloud Speech API, Google Generative AI (Gemini model), SQLite3, and other required packages.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="manual-tab">
+          <div class="installation-steps">
+            <div class="installation-step">
+              <div class="step-number">1</div>
+              <div class="step-details">
+                <h3>Open Terminal/Command Prompt</h3>
+                <p>Navigate to the project directory in your terminal or command prompt.</p>
+                <div class="code-block">
+                  <pre><code>cd path/to/deep-ai</code></pre>
+                </div>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">2</div>
+              <div class="step-details">
+                <h3>Run Dependency Installer</h3>
+                <p>Execute the dependency installer script:</p>
+                <div class="code-block">
+                  <pre><code>node install-dependencies.js</code></pre>
+                </div>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">3</div>
+              <div class="step-details">
+                <h3>Wait for Completion</h3>
+                <p>The script will install all required dependencies automatically.</p>
+                <p class="note">If you encounter any errors during installation, check the console output for details.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="running-tab">
+          <div class="installation-steps">
+            <div class="installation-step">
+              <div class="step-number">1</div>
+              <div class="step-details">
+                <h3>Start the Application</h3>
+                <p>After installation, run the application using npm:</p>
+                <div class="code-block">
+                  <pre><code>npm start</code></pre>
+                </div>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">2</div>
+              <div class="step-details">
+                <h3>Configure Settings</h3>
+                <p>On first launch, click the gear icon to access settings.</p>
+                <p>Configure your n8n webhook URL if you're using n8n.</p>
+                <p class="note">The application will automatically use Gemini AI if n8n is not configured.</p>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">3</div>
+              <div class="step-details">
+                <h3>Build Standalone Application (Optional)</h3>
+                <p>To create a standalone executable:</p>
+                <div class="code-block">
+                  <pre><code>npm run build</code></pre>
+                </div>
+                <p>This will create an installer in the <code>dist</code> folder and a portable executable for distribution.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
-      <div class="workflow-line"></div>
+      
     </div>
   </section>
 
   <section id="contact" class="section dark">
     <div class="section-header">
       <div class="accent-line"></div>
-      <h2>Get Started</h2>
-      <p class="section-subtitle">Download Deep AI Chat and transform your productivity</p>
+      <h2>Get in Touch</h2>
+      <p class="section-subtitle">Have questions or feedback? We're here to help.</p>
     </div>
-    
-    <div class="grid-container">
-      <div class="text-content">
-        <h3>System Requirements</h3>
-        <ul>
-          <li>Node.js (version 16 or higher)</li>
-          <li>Windows, macOS, or Linux operating system</li>
-          <li>Internet connection for AI services</li>
-        </ul>
-        
-        <h3>Installation Options</h3>
-        <p>Choose the installation method that works best for you:</p>
-        <ol>
-          <li>Windows: Double-click the <code>install.bat</code> file</li>
-          <li>macOS/Linux: Run <code>./install.sh</code> in terminal</li>
-          <li>Manual: Run <code>node install-dependencies.js</code></li>
-        </ol>
-        
-        <div class="btn-container">
-          <a href="https://github.com/Rakesh-ada/Deep.git" class="btn">
-            <i class="fab fa-github"></i> Download from GitHub
-          </a>
-        </div>
-      </div>
-    </div>
+    <form id="contact-form">
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea placeholder="Your Message..." required></textarea>
+      <button type="submit">Send Message <i class="fas fa-paper-plane"></i></button>
+    </form>
   </section>
 
   <footer>
     <div class="footer-content">
       <div class="footer-logo">
-        <h3>Deep AI Chat</h3>
-        <p>Intelligent assistance anywhere</p>
+        <div class="logo">Deep AI</div>
+        <p>Floating Chat Interface with Dual AI Systems</p>
       </div>
       <div class="social-links">
-        <a href="https://github.com/Rakesh-ada/Deep.git" class="social-icon" target="_blank"><i class="fab fa-github"></i></a>
-        <a href="mailto:contact@deepaichat.com" class="social-icon"><i class="fas fa-envelope"></i></a>
-        <a href="#" class="social-icon"><i class="fas fa-globe"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/Rakesh-ada/Deep" class="social-icon" target="_blank"><i class="fab fa-github"></i></a>
       </div>
-    </div>
-    <div class="copyright">
-      &copy; 2024 Deep AI Chat. All rights reserved.
+      <div class="copyright">
+    <p>&copy; 2025 Deep AI. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 
-  <script src="https://unpkg.com/gsap@3.11.5/dist/gsap.min.js"></script>
-  <script src="https://unpkg.com/gsap@3.11.5/dist/ScrollTrigger.min.js"></script>
-  <script src="https://unpkg.com/gsap@3.11.5/dist/ScrollToPlugin.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollToPlugin.min.js"></script>
   <script src="script.js"></script>
+  <script src="chat-demo.js"></script>
+  <script>
+    // Animate typing dots
+    const typingAnimation = gsap.timeline({repeat: -1});
+    typingAnimation.to('.dot', {
+      y: -5,
+      duration: 0.4,
+      stagger: 0.2,
+      ease: "power2.out"
+    }).to('.dot', {
+      y: 0,
+      duration: 0.4,
+      stagger: 0.2,
+      ease: "power2.in"
+    });
+    
+    // Animate typing dots in chat popup (created dynamically)
+    document.addEventListener('DOMNodeInserted', (e) => {
+      if (e.target.classList && e.target.classList.contains('typing-dot')) {
+        gsap.fromTo(e.target, 
+          { y: 0, opacity: 0.5 },
+          { 
+            y: -5, 
+            opacity: 1,
+            duration: 0.4,
+            repeat: -1,
+            yoyo: true,
+            ease: "power2.inOut"
+          }
+        );
+      }
+    });
+  </script>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>n8n Workflow Settings</h2>
+      <form id="n8n-settings-form">
+        <div class="form-group">
+          <label for="n8n-url">n8n URL</label>
+          <input type="url" id="n8n-url" placeholder="https://your-n8n-instance.com" required>
+        </div>
+        <div class="form-group">
+          <label for="n8n-api-key">API Key</label>
+          <input type="password" id="n8n-api-key" placeholder="Enter your n8n API key" required>
+        </div>
+        <div class="form-group">
+          <label for="n8n-workflow-id">Workflow ID</label>
+          <input type="text" id="n8n-workflow-id" placeholder="Enter your workflow ID" required>
+        </div>
+        <div class="form-group">
+          <label for="n8n-instance-type">Instance Type</label>
+          <select id="n8n-instance-type" required>
+            <option value="local">Local Self-Hosted</option>
+            <option value="cloud">Cloud Instance</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Save Settings</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>

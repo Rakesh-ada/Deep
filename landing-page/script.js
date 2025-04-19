@@ -46,6 +46,11 @@ document.addEventListener('mousemove', moveGlow);
 // Smooth scrolling
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener("click", function(e) {
+      // Skip the explore button - it will be handled separately
+      if (this.closest('.landing-content') && this.classList.contains('btn')) {
+        return;
+      }
+      
       e.preventDefault();
     const target = document.querySelector(this.getAttribute("href"));
     
@@ -56,6 +61,34 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         offsetY: 80
       },
       ease: "power3.inOut"
+    });
+  });
+});
+
+// Smooth scrolling for navigation links
+document.addEventListener('DOMContentLoaded', function() {
+  const navLinks = document.querySelectorAll('.nav-links a, .btn[href^="#"]');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Only if the href starts with #
+      if (this.getAttribute('href').startsWith('#')) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          const headerOffset = 80;
+          const elementPosition = targetElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }
     });
   });
 });
@@ -548,21 +581,556 @@ const animateAboutSection = () => {
   });
 };
 
-// Initialize animations when DOM is loaded
+// Installation Guide Tabs Functionality
+function initInstallationTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  if (tabBtns.length > 0 && tabContents.length > 0) {
+    console.log('Installation tabs initialized');
+    
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all buttons and contents
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked button
+        btn.classList.add('active');
+        
+        // Show corresponding content
+        const tabId = btn.getAttribute('data-tab');
+        const tabContent = document.getElementById(`${tabId}-tab`);
+        
+        if (tabContent) {
+          tabContent.classList.add('active');
+          console.log(`Activated tab: ${tabId}`);
+        } else {
+          console.error(`Tab content not found: ${tabId}-tab`);
+        }
+      });
+    });
+  } else {
+    console.error('Installation tabs elements not found');
+  }
+}
+
+// Chat Interface Functionality
+const initChatInterface = () => {
+  const chatInput = document.querySelector('.chat-input');
+  const sendBtn = document.querySelector('.send-btn');
+  const chatMessages = document.querySelector('.chat-messages');
+  const clearChatBtn = document.querySelector('.control-btn[title="Clear chat"]');
+  const popupChatMessages = document.querySelector('.chat-popup .chat-messages');
+  const popupChatInput = document.querySelector('.chat-popup .chat-input');
+  const popupSendBtn = document.querySelector('.chat-popup .send-btn');
+  
+  // Function to handle message sending for either regular or popup chat
+  const handleSendMessage = async (msgInput, msgContainer) => {
+    if (!msgInput || !msgContainer) return;
+    
+    const userMessage = msgInput.value.trim();
+    if (userMessage === '') return;
+    
+    // Add user message to chat
+    addMessage(userMessage, 'user', msgContainer);
+    
+    // Clear input
+    msgInput.value = '';
+    msgInput.style.height = 'auto';
+    
+    // Show typing indicator
+    showTypingIndicator(msgContainer);
+    
+    // Update status indicators to show connecting status
+    document.querySelectorAll('.status-indicator').forEach(indicator => {
+      indicator.style.backgroundColor = '#ffcc00';
+      indicator.style.boxShadow = '0 0 10px #ffcc00';
+    });
+    
+    // Send to n8n workflow
+    const response = await sendToN8n(userMessage);
+    if (response) {
+      // Handle n8n response
+      addMessage(response.message || 'Workflow executed successfully', 'assistant', msgContainer);
+    }
+  };
+  
+  // Auto-resize textarea as user types (both regular and popup)
+  document.querySelectorAll('.chat-input').forEach(input => {
+    input.addEventListener('input', () => {
+      input.style.height = '1px';
+      input.style.height = (input.scrollHeight) + 'px';
+    });
+    
+    // Send message on Enter key (but allow shift+enter for new line)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const container = input.closest('.chat-popup') ? 
+          popupChatMessages : chatMessages;
+        handleSendMessage(input, container);
+      }
+    });
+  });
+  
+  // Send button click handlers
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      handleSendMessage(chatInput, chatMessages);
+    });
+  }
+  
+  if (popupSendBtn) {
+    popupSendBtn.addEventListener('click', () => {
+      handleSendMessage(popupChatInput, popupChatMessages);
+    });
+  }
+  
+  // Clear chat history
+  if (clearChatBtn) {
+    clearChatBtn.addEventListener('click', () => {
+      // Keep only the system message
+      const systemMessage = chatMessages.querySelector('.message.system');
+      chatMessages.innerHTML = '';
+      if (systemMessage) chatMessages.appendChild(systemMessage);
+    });
+  }
+  
+  // Add a message to the chat
+  const addMessage = (text, type, container) => {
+    const messageEl = document.createElement('div');
+    messageEl.classList.add('message', type);
+    
+    const contentEl = document.createElement('div');
+    contentEl.classList.add('message-content');
+    
+    // Parse markdown-like syntax for code
+    let formattedText = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Handle code blocks
+    formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    
+    const paragraph = document.createElement('p');
+    paragraph.innerHTML = formattedText;
+    contentEl.appendChild(paragraph);
+    messageEl.appendChild(contentEl);
+    
+    container.appendChild(messageEl);
+    
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+  };
+  
+  // Show typing indicator
+  const showTypingIndicator = (container) => {
+    const typingIndicator = document.createElement('div');
+    typingIndicator.classList.add('message', 'assistant', 'typing-message');
+    
+    const contentEl = document.createElement('div');
+    contentEl.classList.add('message-content');
+    
+    const indicatorEl = document.createElement('div');
+    indicatorEl.classList.add('typing-indicator');
+    
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('span');
+      dot.classList.add('typing-dot');
+      indicatorEl.appendChild(dot);
+    }
+    
+    contentEl.appendChild(indicatorEl);
+    typingIndicator.appendChild(contentEl);
+    container.appendChild(typingIndicator);
+    
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+  };
+  
+  // Remove typing indicator
+  const removeTypingIndicator = (container) => {
+    const typingMessage = container.querySelector('.typing-message');
+    if (typingMessage) {
+      typingMessage.remove();
+    }
+  };
+  
+  // Handle minimize button for popup
+  const minimizeBtn = document.getElementById('minimize-chat-popup');
+  const chatPopup = document.getElementById('chat-popup');
+  
+  if (minimizeBtn && chatPopup) {
+    minimizeBtn.addEventListener('click', () => {
+      // Minimize animation
+      gsap.to(chatPopup, {
+        height: '60px',
+        duration: 0.3,
+        ease: "power3.out"
+      });
+      
+      // Change minimize to maximize
+      minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>';
+      minimizeBtn.title = "Maximize";
+      
+      // Swap event listener
+      minimizeBtn.onclick = () => {
+        gsap.to(chatPopup, {
+          height: '520px',
+          duration: 0.3,
+          ease: "power3.out"
+        });
+        
+        minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>';
+        minimizeBtn.title = "Minimize";
+        minimizeBtn.onclick = minimizeBtn.originalHandler;
+      };
+      
+      // Store original handler
+      if (!minimizeBtn.originalHandler) {
+        minimizeBtn.originalHandler = minimizeBtn.onclick;
+      }
+    });
+  }
+};
+
+// Initialize floating chat button
+const initFloatingChatButton = () => {
+  const floatingBtn = document.getElementById('floating-chat-btn');
+  
+  if (floatingBtn) {
+    // Show button after scrolling past landing section
+    ScrollTrigger.create({
+      trigger: '.landing',
+      start: 'bottom center',
+      onEnter: () => {
+        floatingBtn.classList.add('visible');
+      },
+      onLeaveBack: () => {
+        floatingBtn.classList.remove('visible');
+      }
+    });
+    
+    // Hide button when the chat section is visible
+    ScrollTrigger.create({
+      trigger: '#chat',
+      start: 'top bottom',
+      end: 'bottom top',
+      onEnter: () => {
+        floatingBtn.classList.remove('visible');
+      },
+      onLeave: () => {
+        floatingBtn.classList.add('visible');
+      },
+      onEnterBack: () => {
+        floatingBtn.classList.remove('visible');
+      },
+      onLeaveBack: () => {
+        floatingBtn.classList.add('visible');
+      }
+    });
+    
+    // Button click handler
+    floatingBtn.addEventListener('click', () => {
+      // Handle popup display
+      const chatPopup = document.getElementById('chat-popup');
+      if (chatPopup) {
+        chatPopup.style.display = 'flex';
+        chatPopup.style.height = '520px';
+        
+        // Reset minimize button if needed
+        const minimizeBtn = document.getElementById('minimize-chat-popup');
+        if (minimizeBtn) {
+          minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>';
+          minimizeBtn.title = "Minimize";
+        }
+        
+        // Animate popup
+        gsap.fromTo(chatPopup, 
+          { opacity: 0, y: 20 }, 
+          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+        );
+        
+        // Focus input
+        setTimeout(() => {
+          const chatInput = chatPopup.querySelector('.chat-input');
+          if (chatInput) chatInput.focus();
+        }, 600);
+      }
+    });
+  }
+};
+
+// Section Fade Animation on Scroll
+const initSectionFadeEffect = () => {
+  // Set all sections to initially visible
+  const sections = document.querySelectorAll('.section');
+  
+  // Make each section aware of its position
+  sections.forEach((section, index) => {
+    section.dataset.sectionIndex = index;
+    
+    // Ensure all sections are initially visible
+    if (index === 0) {
+      gsap.set(section, { opacity: 1 });
+    } else {
+      gsap.set(section, { opacity: 0.3 });
+    }
+  });
+  
+  // Track the current visible section
+  let currentVisibleSection = 0;
+  
+  // Create a single ScrollTrigger that updates all sections
+  ScrollTrigger.create({
+    trigger: 'body',
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: (self) => {
+      // Determine which section is most visible in the viewport
+      let newCurrentSection = 0;
+      let highestVisibility = 0;
+      
+      sections.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        
+        // Calculate how much of the section is visible
+        const visibleTop = Math.max(0, rect.top);
+        const visibleBottom = Math.min(windowHeight, rect.bottom);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        const percentVisible = visibleHeight / windowHeight;
+        
+        if (percentVisible > highestVisibility && percentVisible > 0.2) { // Must be at least 20% visible
+          highestVisibility = percentVisible;
+          newCurrentSection = index;
+        }
+      });
+      
+      // Only update if the current section has changed
+      if (newCurrentSection !== currentVisibleSection) {
+        console.log(`Switching to section ${newCurrentSection}`);
+        
+        // Handle section visibility changes
+        sections.forEach((section, index) => {
+          if (index === newCurrentSection) {
+            // Make current section fully visible
+            gsap.to(section, {
+              opacity: 1,
+              duration: 0.5,
+              ease: "power2.inOut"
+            });
+          } else if (index < newCurrentSection) {
+            // Make previous sections completely invisible
+            gsap.to(section, {
+              opacity: 0,
+              duration: 0.5,
+              ease: "power2.inOut"
+            });
+          } else {
+            // Make future sections partially visible
+            gsap.to(section, {
+              opacity: 0.2,
+              duration: 0.5,
+              ease: "power2.inOut"
+            });
+          }
+        });
+        
+        // Update current section tracker
+        currentVisibleSection = newCurrentSection;
+      }
+    }
+  });
+};
+
+// Initialize bottom gradient light
+const initBottomGradientLight = () => {
+  // Create a blue gradient light element that follows the scroll
+  const body = document.querySelector('body');
+  const gradientLight = document.createElement('div');
+  gradientLight.className = 'bottom-gradient-light';
+  body.appendChild(gradientLight);
+  
+  // Position the gradient light based on scroll
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.body.scrollHeight;
+    
+    // Calculate the scroll percentage
+    const scrollPercentage = scrollY / (documentHeight - windowHeight);
+    
+    // Update the gradient light opacity
+    gradientLight.style.opacity = Math.min(0.5 + scrollPercentage * 0.5, 0.9);
+  });
+  
+  // Make gradient subtly follow mouse movement
+  document.addEventListener('mousemove', (e) => {
+    const mouseX = e.clientX / window.innerWidth;
+    const mouseY = e.clientY / window.innerHeight;
+    
+    // Subtle movement based on mouse position
+    gsap.to(gradientLight, {
+      x: (mouseX - 0.5) * 30,
+      duration: 1,
+      ease: "power2.out"
+    });
+  });
+  
+  // Animate the gradient with a gentle pulsing effect
+  gsap.to(gradientLight, {
+    scale: 1.1,
+    duration: 3,
+    repeat: -1,
+    yoyo: true,
+    ease: "sine.inOut"
+  });
+};
+
+// n8n Integration Settings
+let n8nConfig = {
+  url: '',
+  apiKey: '',
+  workflowId: '',
+  instanceType: 'local'
+};
+
+// Populate settings form with saved values
+function populateSettingsForm() {
+  document.getElementById('n8n-url').value = n8nConfig.url;
+  document.getElementById('n8n-api-key').value = n8nConfig.apiKey;
+  document.getElementById('n8n-workflow-id').value = n8nConfig.workflowId;
+  document.getElementById('n8n-instance-type').value = n8nConfig.instanceType;
+}
+
+// Save settings
+function saveSettings() {
+  n8nConfig = {
+    url: document.getElementById('n8n-url').value,
+    apiKey: document.getElementById('n8n-api-key').value,
+    workflowId: document.getElementById('n8n-workflow-id').value,
+    instanceType: document.getElementById('n8n-instance-type').value
+  };
+
+  localStorage.setItem('n8nSettings', JSON.stringify(n8nConfig));
+  document.getElementById('settings-modal').style.display = 'none';
+  
+  // Show success message
+  showMessage('Settings saved successfully!', 'success');
+}
+
+// Send message to n8n workflow
+async function sendToN8n(message) {
+  if (!n8nConfig.url || !n8nConfig.apiKey || !n8nConfig.workflowId) {
+    showMessage('Please configure n8n settings first', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${n8nConfig.url}/webhook/${n8nConfig.workflowId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${n8nConfig.apiKey}`
+      },
+      body: JSON.stringify({
+        message: message
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to send message to n8n');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error sending message to n8n:', error);
+    showMessage('Error connecting to n8n workflow', 'error');
+    return null;
+  }
+}
+
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize bottom gradient light first to ensure it's active
+  initBottomGradientLight();
+  
+  // Initialize all animations and interactions
+  animateGlows();
   animateSections();
+  animateFeatureCards();
+  animateWorkflow();
   simulateTyping();
   createParallax();
   enhanceMockup();
-  animateGlows();
   animateAboutSection();
-  animateFeatureCards();
-  animateWorkflow();
+  initChatInterface();
+  initFloatingChatButton();
+  initSectionFadeEffect();
+  
+  // Initialize installation tabs
+  initInstallationTabs();
+  
+  // Populate settings form
+  populateSettingsForm();
   
   // Add CSS for dynamic elements
   const style = document.createElement('style');
-  style.textContent = ``;
+  style.textContent = `
+    .chat-controls .settings-icon {
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+      padding: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .chat-controls .settings-icon:hover {
+      color: #00ff88;
+      transform: rotate(90deg);
+      background: rgba(255, 255, 255, 0.2);
+    }
+  `;
   document.head.appendChild(style);
+  
+  // Initialize settings modal
+  const settingsIcon = document.querySelector('.settings-icon');
+  const modal = document.getElementById('settings-modal');
+  const closeBtn = document.querySelector('.close-modal');
+  const settingsForm = document.getElementById('n8n-settings-form');
+
+  // Load saved settings
+  const savedSettings = localStorage.getItem('n8nSettings');
+  if (savedSettings) {
+    n8nConfig = JSON.parse(savedSettings);
+    populateSettingsForm();
+  }
+
+  // Open modal
+  settingsIcon.addEventListener('click', () => {
+    modal.style.display = 'block';
+  });
+
+  // Close modal
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  // Close modal when clicking outside
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  // Handle form submission
+  settingsForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveSettings();
+  });
   
   // Initial animation for landing section
   const tl = gsap.timeline();
@@ -573,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .from(".mockup", { y: 50, opacity: 0, duration: 1.2, ease: "power3.out" }, "-=0.5");
   
   // Form submission handling
-  document.getElementById("contact-form").addEventListener("submit", function(e) {
+  document.getElementById("contact-form")?.addEventListener("submit", function(e) {
     e.preventDefault();
     
     // Animate button to show processing
@@ -591,6 +1159,123 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 2000);
     }, 1500);
   });
+  
+  // Make chat interface appear when clicking on the Explore button
+  const exploreBtn = document.querySelector('.landing-content .btn');
+  const chatPopup = document.querySelector('#chat-popup');
+  
+  // Initial state - chat popup is hidden
+  if (chatPopup) {
+    chatPopup.style.display = 'none';
+  }
+  
+  // Handle Explore button click
+  exploreBtn?.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // Show the chat popup
+    if (chatPopup) {
+      chatPopup.style.display = 'flex';
+      // Reset height in case it was minimized
+      chatPopup.style.height = '520px';
+      
+      // Reset minimize button if needed
+      const minimizeBtn = document.getElementById('minimize-chat-popup');
+      if (minimizeBtn) {
+        minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>';
+        minimizeBtn.title = "Minimize";
+      }
+      
+      // Animate popup
+      gsap.fromTo(chatPopup, 
+        { opacity: 0, y: 20 }, 
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+      );
+      
+      // Focus input
+      setTimeout(() => {
+        const chatInput = chatPopup.querySelector('.chat-input');
+        if (chatInput) chatInput.focus();
+      }, 600);
+    }
+  });
+  
+  // Close button functionality for chat popup
+  const closePopupBtn = document.querySelector('#close-chat-popup');
+  closePopupBtn?.addEventListener('click', () => {
+    if (chatPopup) {
+      gsap.to(chatPopup, {
+        opacity: 0, 
+        y: 20, 
+        duration: 0.3, 
+        ease: "power3.in",
+        onComplete: () => {
+          chatPopup.style.display = 'none';
+        }
+      });
+    }
+  });
+  
+  // View full chat button functionality
+  const viewFullChatBtn = document.querySelector('#view-full-chat');
+  viewFullChatBtn?.addEventListener('click', () => {
+    // Close the popup
+    if (chatPopup) {
+      gsap.to(chatPopup, {
+        opacity: 0, 
+        y: 20, 
+        duration: 0.3, 
+        ease: "power3.in",
+        onComplete: () => {
+          chatPopup.style.display = 'none';
+        }
+      });
+    }
+    
+    // Scroll to the chat section
+    const chatSection = document.querySelector('#chat');
+    if (chatSection) {
+      gsap.to(window, {
+        duration: 1,
+        scrollTo: {
+          y: chatSection,
+          offsetY: 80
+        },
+        ease: "power3.inOut"
+      });
+    }
+  });
+  
+  // Mobile Menu Toggle
+  const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', function() {
+      navLinks.classList.toggle('active');
+      
+      // Change icon based on menu state
+      const icon = this.querySelector('i');
+      if (navLinks.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      }
+    });
+    
+    // Close menu when clicking on a nav link
+    const navItems = document.querySelectorAll('.nav-links a');
+    navItems.forEach(item => {
+      item.addEventListener('click', function() {
+        navLinks.classList.remove('active');
+        const icon = mobileMenuToggle.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      });
+    });
+  }
 });
 
 // Floating effect on scroll for mockup
@@ -626,4 +1311,3 @@ ScrollTrigger.create({
     });
   }
   });
-  
