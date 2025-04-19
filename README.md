@@ -68,28 +68,28 @@ You don't need to manually install or start n8n - the application handles this a
 - [Node.js](https://nodejs.org/) (version 16 or higher)
 - npm (included with Node.js)
 
-### Automatic Installation
+### Manual Installation (Recommended)
 
-1. **Windows users**: Double-click the `install.bat` file
-2. **macOS/Linux users**: Open a terminal in the project directory and run:
+1. **Install Electron (large download, do this first!):**
    ```
-   chmod +x install.sh
-   ./install.sh
+   node install-electron.js
    ```
-
-### Manual Installation
-
-If the automatic installation doesn't work, follow these steps:
-
-1. Open a terminal or command prompt in the project directory
-2. Run the dependency installer:
+2. **Install all other dependencies:**
    ```
    node install-dependencies.js
    ```
+   - You must run both scripts from the project directory.
+   - Installing Electron may take several minutes due to its large size (over 250 MB).
+   - All other dependencies will install quickly in comparison.
+
+**Troubleshooting:**
+- If your install is interrupted or fails, try running the scripts again.
+- A slow or unstable internet connection may cause Electron to take longer to download.
+
 
 ### Dependencies
 
-The installation script will ensure all required dependencies are installed:
+The installation scripts will ensure all required dependencies are installed:
 
 - Electron (UI framework)
 - n8n (workflow automation)
@@ -128,4 +128,13 @@ This will create:
 
 - If you encounter missing dependency errors, run the installer again
 - For n8n connection issues, ensure n8n is running and your webhook URL is correct
-- Check the application logs for detailed error messages 
+- Check the application logs for detailed error messages
+
+## Acknowledgments
+
+This project uses and is inspired by the amazing open-source project [n8n](https://n8n.io/).
+
+- [n8n GitHub Repository](https://github.com/n8n-io/n8n)
+- [n8n Official Website](https://n8n.io/)
+
+We thank the n8n team and community for their outstanding work in workflow automation!

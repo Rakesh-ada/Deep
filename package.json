@@ -9,7 +9,9 @@
     "clean": "rimraf dist node_modules/.cache",
     "build": "electron-builder --win",
     "build:win": "electron-builder --win",
-    "build:portable": "electron-builder --win portable"
+    "build:portable": "electron-builder --win portable --dir",
+    "build:simple": "electron-builder --win portable --dir",
+    "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [
     "electron",
@@ -20,8 +22,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@electron/node-gyp": "^10.2.0-electron.2",
     "electron": "^28.0.0",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "electron-rebuild": "^3.2.9"
   },
   "build": {
     "appId": "com.chat.floatingapp",
@@ -30,11 +34,19 @@
       "output": "dist"
     },
     "files": [
-      "*.js",
-      "*.html",
-      "*.css",
+      "main.js",
+      "preload.js",
+      "index.html",
+      "style.css",
       "assets/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "!landing-page/**/*",
+      "!install-dependencies.js",
+      "!install-electron.js",
+      "!install.bat",
+      "!install.sh",
+      "!README.md",
+      "!LICENSE"
     ],
     "extraResources": [
       {
@@ -49,13 +61,26 @@
       "node_modules/**/*"
     ],
     "win": {
-      "target": "nsis",
-      "artifactName": "${productName}-${version}.${ext}"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "nsis": {
-      "oneClick": false,
+      "oneClick": true,
+      "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Deep AI Chat",
+      "installerIcon": "assets/deep.ico",
+      "uninstallerIcon": "assets/deep.ico",
+      "installerHeaderIcon": "assets/deep.ico"
     },
     "portable": {
       "artifactName": "${productName}-Portable-${version}.${ext}"

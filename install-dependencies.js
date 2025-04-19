@@ -2,9 +2,8 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// List of core dependencies required by the application
+// List of core dependencies required by the application (excluding Electron)
 const CORE_DEPENDENCIES = [
-  'electron@28.0.0',
   'node-fetch@2.7.0',
   '@google-cloud/speech@7.0.1',
   '@google/generative-ai@0.2.1',
@@ -84,6 +83,23 @@ function runCommand(command, args, options = {}) {
   });
 }
 
+// Function to get directory size in bytes
+function getDirectorySize(dirPath) {
+  let totalSize = 0;
+  if (!fs.existsSync(dirPath)) return 0;
+  const files = fs.readdirSync(dirPath);
+  for (const file of files) {
+    const filePath = path.join(dirPath, file);
+    const stats = fs.statSync(filePath);
+    if (stats.isDirectory()) {
+      totalSize += getDirectorySize(filePath);
+    } else {
+      totalSize += stats.size;
+    }
+  }
+  return totalSize;
+}
+
 // Function to check if a dependency is installed
 function isDependencyInstalled(dependency) {
   const name = dependency.split('@')[0];
@@ -96,12 +112,26 @@ function isDependencyInstalled(dependency) {
   }
 }
 
-// Function to install a single dependency
+// Function to install a single dependency WITH TIMING & SIZE
 async function installDependency(dependency) {
   try {
     console.log(`Installing ${dependency}...`);
+    const startTime = Date.now();
     await runCommand('npm', ['install', '--save', dependency]);
-    console.log(`✅ ${dependency} installed successfully`);
+    const endTime = Date.now();
+    const elapsed = ((endTime - startTime) / 1000).toFixed(2);
+    // Try to get installed package size
+    const name = dependency.split('@')[0];
+    const pkgPath = path.join('node_modules', name);
+    let sizeMB = 0;
+    if (fs.existsSync(pkgPath)) {
+      const sizeBytes = getDirectorySize(pkgPath);
+      sizeMB = (sizeBytes / (1024 * 1024)).toFixed(2);
+    }
+    let msg = `✅ ${dependency} installed successfully in ${elapsed}s`;
+    if (sizeMB > 0) msg += ` (size: ${sizeMB} MB)`;
+    if (elapsed > 20) msg += ' ⚠️ (slow install)';
+    console.log(msg);
     return true;
   } catch (error) {
     console.error(`❌ Failed to install ${dependency}: ${error.stderr || error.message}`);
@@ -109,16 +139,29 @@ async function installDependency(dependency) {
   }
 }
 
-// Function to install multiple dependencies
+// Function to install multiple dependencies WITH PROGRESS BAR
 async function installDependencies(dependencies) {
   console.log(`Installing ${dependencies.length} dependencies...`);
-  
+
   const results = [];
+  let installedCount = 0;
+  const total = dependencies.length;
+
+  function renderProgress(installed, total) {
+    const percent = Math.round((installed / total) * 100);
+    const barLength = 30;
+    const filled = Math.round((percent / 100) * barLength);
+    const bar = '█'.repeat(filled) + '-'.repeat(barLength - filled);
+    process.stdout.write(`\r[${bar}] ${installed}/${total} (${percent}%)`);
+  }
+
   for (const dependency of dependencies) {
     const success = await installDependency(dependency);
+    installedCount++;
+    renderProgress(installedCount, total);
     results.push({ dependency, success });
   }
-  
+  process.stdout.write('\n'); // Newline after progress bar
   return results;
 }
 
