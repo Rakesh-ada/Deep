@@ -25,7 +25,7 @@
 
 .chat-popup.minimized {
   height: 60px;
-  border-radius: 16px 16px 0 0;
+  border-radius: 16px;
   overflow: hidden;
   transform: translateZ(0);
 }
@@ -192,27 +192,50 @@
   font-size: 13px;
 }
 
-.typing-dots {
+/* Enhanced typing indicator */
+.typing-indicator {
   display: flex;
-  gap: 4px;
-  padding: 8px 4px;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 0 6px 0;
 }
 
-.dot {
-  width: 8px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.6);
+.typing-dot {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #00DCD4 40%, #9d4bff 100%);
   border-radius: 50%;
-  animation: pulse 1.5s infinite;
+  opacity: 0.7;
+  animation: typingBounce 1.2s infinite;
+  margin: 0 2px;
 }
 
-.dot:nth-child(2) {
+.typing-dot:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.dot:nth-child(3) {
+.typing-dot:nth-child(3) {
   animation-delay: 0.4s;
 }
+
+@keyframes typingBounce {
+  0%, 100% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-8px) scale(1.1);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0.7;
+  }
+}
+
+/* Remove old dot and typing-dots rules if present */
+.typing-dots, .dot { display: none !important; }
 
 .chat-input-container {
   padding: 12px 16px;
