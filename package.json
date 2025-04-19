@@ -22,10 +22,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@electron/node-gyp": "^10.2.0-electron.2",
     "electron": "^28.0.0",
-    "electron-builder": "^24.9.1",
-    "electron-rebuild": "^3.2.9"
+    "electron-builder": "^24.9.1"
   },
   "build": {
     "appId": "com.chat.floatingapp",
@@ -89,7 +87,6 @@
   "dependencies": {
     "@google-cloud/speech": "^7.0.1",
     "@google/generative-ai": "^0.2.1",
-    "googleapis": "^148.0.0",
     "n8n": "^1.30.1",
     "node-fetch": "^2.7.0",
     "sqlite3": "^5.1.7"
