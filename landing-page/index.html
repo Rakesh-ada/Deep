@@ -3,6 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    /* Additional styles for installation section */
+    .important-note {
+      background: rgba(255, 240, 0, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    
+    .important-note i {
+      color: var(--accent);
+      margin-right: 8px;
+    }
+    
+    .feature-list {
+      margin: 12px 0;
+      padding-left: 20px;
+      color: var(--text);
+    }
+    
+    .feature-list li {
+      margin-bottom: 8px;
+      position: relative;
+    }
+    
+    .feature-list li strong {
+      color: var(--primary);
+    }
+  </style>
   <title>Deep AI — A Glowing Flame on your Desktop</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="chat-demo.css"/>
@@ -25,7 +57,7 @@
         <li><a href="#about">About</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#how">How it Works</a></li>
-        <li><a href="#chat">Templates</a></li>
+        <li><a href="templates/workflow-templates.html" target="_blank">Workflow Templates</a></li>
         <li><a href="#installation">Installation</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
@@ -338,7 +370,7 @@
             </div>
           </div>
           
-          <a href="https://n8n-templates.deepai.com" class="btn template-btn">Browse Templates <i class="fas fa-external-link-alt"></i></a>
+          <a href="templates/workflow-templates.html" class="btn template-btn">Browse Templates <i class="fas fa-external-link-alt"></i></a>
         </div>
         
         <div class="templates-showcase">
@@ -441,6 +473,7 @@
                 <h3>Verification</h3>
                 <p>The installer will automatically check and install all required dependencies.</p>
                 <p class="note">The installation includes Electron, n8n, Google Cloud Speech API, Google Generative AI (Gemini model), SQLite3, and other required packages.</p>
+                <p class="important-note"><i class="fas fa-info-circle"></i> <strong>Important:</strong> You don't need to manually install or start n8n - the application handles this automatically!</p>
               </div>
             </div>
           </div>
@@ -462,20 +495,24 @@
             <div class="installation-step">
               <div class="step-number">2</div>
               <div class="step-details">
-                <h3>Run Dependency Installer</h3>
-                <p>Execute the dependency installer script:</p>
+                <h3>Install Electron First</h3>
+                <p>Electron is a large download (over 250 MB), so it's recommended to install it first:</p>
                 <div class="code-block">
-                  <pre><code>node install-dependencies.js</code></pre>
+                  <pre><code>node install-electron.js</code></pre>
                 </div>
+                <p class="note">This may take several minutes due to Electron's large size.</p>
               </div>
             </div>
             
             <div class="installation-step">
               <div class="step-number">3</div>
               <div class="step-details">
-                <h3>Wait for Completion</h3>
-                <p>The script will install all required dependencies automatically.</p>
-                <p class="note">If you encounter any errors during installation, check the console output for details.</p>
+                <h3>Install All Other Dependencies</h3>
+                <p>After Electron is installed, run the dependencies installer script:</p>
+                <div class="code-block">
+                  <pre><code>node install-dependencies.js</code></pre>
+                </div>
+                <p class="note">If your install is interrupted or fails, try running the scripts again. A slow or unstable internet connection may cause delays.</p>
               </div>
             </div>
           </div>
@@ -499,8 +536,12 @@
               <div class="step-details">
                 <h3>Configure Settings</h3>
                 <p>On first launch, click the gear icon to access settings.</p>
-                <p>Configure your n8n webhook URL if you're using n8n.</p>
-                <p class="note">The application will automatically use Gemini AI if n8n is not configured.</p>
+                <p>The application works with n8n in two ways:</p>
+                <ul class="feature-list">
+                  <li><strong>Integrated Mode:</strong> The app will automatically start n8n when launched, and stop it when closed</li>
+                  <li><strong>External Mode:</strong> If n8n is already running (e.g., you started it separately with <code>npx n8n start</code>), the app will detect and connect to it automatically</li>
+                </ul>
+                <p class="note">The application will automatically use Gemini AI if n8n is not configured or unavailable.</p>
               </div>
             </div>
             

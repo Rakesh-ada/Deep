@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n Workflow Templates — Deep AI</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00f0ff;
+      --secondary: #9000ff;
+      --dark: #0a1018;
+      --light: #ffffff;
+      --accent: #ff2e63;
+      --text: #e2e8f0;
+      --primary-dark: #00bfb6;
+      --primary-light: #e6fcfa;
+      --gray-dark: #4a5568;
+      --gray: #718096;
+      --gray-light: #e2e8f0;
+      --white: #ffffff;
+      --bg: #0a1018;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 0.25rem;
+      --radius: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      background: var(--dark); 
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    .container { 
+      max-width: 1100px; 
+      margin: 80px auto 40px; 
+      background: rgba(10, 17, 30, 0.4); 
+      border-radius: var(--radius-lg); 
+      box-shadow: var(--shadow-md); 
+      padding: 2.5rem;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+    }
+    
+    h1, h2, h3 { 
+      color: var(--light); 
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      display: inline-block;
+    }
+    
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--primary);
+    }
+    
+    p {
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+    
+    .template-section { margin-bottom: 3rem; }
+    
+    pre { 
+      background: rgba(10, 16, 24, 0.6); 
+      border-radius: var(--radius); 
+      padding: 1.25rem; 
+      overflow-x: auto; 
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.875rem;
+      color: var(--text);
+      position: relative;
+    }
+    
+    .step-list { 
+      margin: 1.25rem 0 0 0; 
+      padding: 0 0 0 1.5rem;
+      color: var(--text);
+    }
+    
+    .step-list li {
+      margin-bottom: 0.75rem;
+    }
+    
+    .step-list li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .video-note { 
+      background: rgba(0, 240, 255, 0.1); 
+      border-left: 4px solid var(--primary); 
+      padding: 1rem 1.25rem; 
+      border-radius: var(--radius-sm); 
+      margin-top: 1.25rem;
+      font-size: 0.95rem;
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+    
+    .video-note:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    
+    .copy-btn { 
+      background: var(--primary); 
+      color: var(--dark); 
+      border: none; 
+      border-radius: var(--radius-sm); 
+      padding: 0.5rem 1rem; 
+      cursor: pointer; 
+      margin-top: 0.75rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .copy-btn:hover { 
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    
+    .copy-btn:active {
+      transform: translateY(0);
+    }
+    
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-color: rgba(6, 11, 16, 0.9);
+      z-index: -1;
+      opacity: 0.4;
+    }
+    
+    .glow {
+      position: absolute;
+      width: 40%;
+      height: 50%;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .glow-1 {
+      top: 20%;
+      left: 15%;
+      width: 50%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(144, 0, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    }
+    
+    .glow-2 {
+      top: 50%;
+      right: 5%;
+      width: 60%;
+      height: 70%;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    }
+    
+    .navbar { 
+      background: linear-gradient(90deg, var(--dark) 0%, #2d3748 100%);
+      color: var(--white); 
+      padding: 1.25rem 2rem; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    
+    .logo { 
+      font-size: 1.5rem; 
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--white) 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      display: inline-block;
+    }
+    
+    .nav-links { 
+      list-style: none; 
+      margin: 0; 
+      padding: 0; 
+      display: flex; 
+      gap: 2rem;
+    }
+    
+    .nav-links a { 
+      color: var(--white); 
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      padding: 0.5rem 0;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-links a:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+    }
+    
+    .nav-links a:hover:after {
+      width: 100%;
+    }
+    
+    .workflow-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+    
+    .workflow-card { 
+      background-color: rgba(10, 17, 30, 0.6); 
+      padding: 1.75rem; 
+      border-radius: var(--radius-md); 
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .workflow-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+      background-color: rgba(10, 17, 30, 0.8);
+    }
+    
+    .workflow-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    
+    .workflow-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .workflow-icon { 
+      font-size: 2.5rem; 
+      margin-bottom: 1rem;
+      color: var(--primary);
+      background: var(--primary-light);
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .workflow-tags { 
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    .workflow-tag { 
+      background-color: rgba(255, 255, 255, 0.1); 
+      padding: 0.35rem 0.75rem; 
+      border-radius: var(--radius-sm); 
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+    
+    .workflow-tag:hover {
+      background-color: rgba(0, 240, 255, 0.2);
+      color: var(--primary);
+    }
+    
+    .section-header { 
+      background-color: rgba(10, 17, 30, 0.6); 
+      padding: 1.75rem; 
+      border-radius: var(--radius-md);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .accent-line { 
+      height: 4px; 
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: var(--dark);
+      color: var(--white);
+      text-align: center;
+      border-radius: var(--radius-sm);
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -60px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.75rem;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: var(--text);
+      font-size: 0.875rem;
+      padding: 1.5rem;
+      background: rgba(10, 17, 30, 0.4);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .page-intro {
+      max-width: 800px;
+      margin: 0 auto 3rem auto;
+      text-align: center;
+    }
+    
+    .page-intro p {
+      font-size: 1.125rem;
+      color: var(--gray);
+    }
+    
+    .success-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(10, 16, 24, 0.9);
+      color: var(--light);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      transform: translateX(200%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+    
+    .success-message.show {
+      transform: translateX(0);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+        margin: 20px 15px;
+      }
+      
+      .navbar {
+        flex-direction: column;
+        padding: 1rem;
+      }
+      
+      .nav-links {
+        margin-top: 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .workflow-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .workflow-card {
+        padding: 1.25rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .container {
+        padding: 1.25rem;
+      }
+      
+      .workflow-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Add initial styles for animations -->
+  <style>
+    .workflow-card {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    /* New styles for import methods */
+    .import-methods {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+    
+    .import-method {
+      background: rgba(10, 17, 30, 0.5);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .import-method:hover {
+      background: rgba(10, 17, 30, 0.7);
+      border-color: rgba(0, 240, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .import-method h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary);
+    }
+    
+    .tips-container {
+      margin-top: 2rem;
+      background: rgba(144, 0, 255, 0.1);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      border-left: 4px solid var(--secondary);
+    }
+    
+    .tips-container h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--secondary);
+      margin-bottom: 1rem;
+    }
+    
+    .tips-list {
+      padding-left: 1.5rem;
+      color: var(--text);
+    }
+    
+    .tips-list li {
+      margin-bottom: 0.75rem;
+    }
+    
+    kbd {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+      color: var(--text);
+      display: inline-block;
+      font-size: 0.85em;
+      font-family: monospace;
+      line-height: 1;
+      padding: 2px 5px;
+      margin: 0 2px;
+    }
+    
+    /* Code Preview Styles */
+    .code-preview {
+      background: rgba(10, 17, 30, 0.7);
+      border-radius: var(--radius);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      padding: 1.25rem;
+      margin: 1rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .code-preview::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="1" height="1" fill="rgba(0,240,255,0.03)" /></svg>');
+      background-size: 20px 20px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    
+    .code-preview-content {
+      position: relative;
+      z-index: 1;
+      color: var(--primary);
+      font-weight: 500;
+      font-size: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .code-preview-content i {
+      margin-right: 0.5rem;
+    }
+    
+    .code-description {
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: normal;
+      margin: 0;
+      line-height: 1.5;
+    }
+    
+    .workflow-image {
+      margin-top: 1rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .workflow-image:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+    
+    .workflow-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* Video Tutorials Section */
+    .video-tutorials-section {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: rgba(10, 17, 30, 0.5);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .video-tutorials-section h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .video-tutorials-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 3px;
+    }
+    
+    .video-tutorials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .video-tutorial-card {
+      background: rgba(10, 17, 30, 0.7);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .video-tutorial-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 240, 255, 0.2);
+      border-color: var(--primary);
+    }
+    
+    .video-thumbnail {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+    }
+    
+    .video-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .video-thumbnail:hover img {
+      transform: scale(1.05);
+    }
+    
+    .play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+    
+    .video-thumbnail:hover .play-button {
+      opacity: 1;
+      background: rgba(0, 240, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+    }
+    
+    .video-tutorial-card h3 {
+      padding: 1.25rem 1.25rem 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .video-tutorial-card p {
+      padding: 0 1.25rem 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text);
+      margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+      .video-tutorials-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .import-methods {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .back-to-home {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+    }
+    
+    .back-to-home a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 10px 16px;
+      background: rgba(10, 16, 24, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .back-to-home a:hover {
+      color: var(--primary);
+      background: rgba(10, 16, 24, 0.9);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 240, 255, 0.15);
+    }
+  </style>
+  <!-- Background Elements -->
+  <div class="bg-grid"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  
+  <!-- Back to Home Link -->
+  <div class="back-to-home">
+    <a href="../index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
+  </div>
+  
+  <!-- Main Content -->
+  <main class="container">
+    <div class="page-intro">
+      <h1>n8n Workflow Templates</h1>
+      <p>Jumpstart your automation journey with these ready-to-use workflow templates for n8n. Follow the instructions below each template to quickly set up and start automating!</p>
+    </div>
+    <div class="workflow-grid">
+      <!-- Gmail Workflow Card -->
+      <div class="workflow-card">
+        <div class="workflow-icon"><i class="fas fa-envelope"></i></div>
+        <h3>Gmail: Send Email Workflow</h3>
+        <p>Send emails via Gmail automatically. Great for notifications, alerts, or automated messages.</p>
+        <div class="workflow-tags">
+          <span class="workflow-tag">Email</span>
+          <span class="workflow-tag">Gmail</span>
+          <span class="workflow-tag">Automation</span>
+        </div>
+        <button class="copy-btn" onclick="copyToClipboard('gmail-json')"><i class="fas fa-copy"></i> Copy JSON</button>
+        <div class="workflow-image">
+          <img src="gmail.png" alt="Gmail Workflow Diagram" />
+        </div>
+        <p class="code-description">This workflow connects a webhook to an AI Agent powered by Google Gemini, with Gmail integration for sending emails.</p>
+        <pre id="gmail-json" style="display: none;">{"name":"My workflow","nodes":[{"parameters":{"promptType":"define","text":"={{ $json.body.message }}","options":{}},"type":"@n8n/n8n-nodes-langchain.agent","typeVersion":1.8,"position":[0,-20],"id":"c1430e7f-670c-45ff-80be-ed5a2a5b7d50","name":"AI Agent"},{"parameters":{"sendTo":"={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}","subject":"={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}","emailType":"text","message":"={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}","options":{}},"type":"n8n-nodes-base.gmailTool","typeVersion":2.1,"position":[360,220],"id":"70d79f01-431b-4bba-9ed3-9a93918c2f3f","name":"Gmail","webhookId":"f7e28350-4c20-4277-ab7a-6deb344a42c6","credentials":{"gmailOAuth2":{"id":"caqCEnsCiejZYas0","name":"Gmail account"}}},{"parameters":{"httpMethod":"POST","path":"gmail","responseMode":"responseNode","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[-260,-20],"id":"1f8e8d01-a602-4b12-8994-fd36567647a2","name":"Webhook","webhookId":"2c3468c8-f555-46cb-984d-4129673d81cc"},{"parameters":{"options":{}},"type":"n8n-nodes-base.respondToWebhook","typeVersion":1.1,"position":[700,-20],"id":"75ca9afa-d804-4b1d-ac76-652d01e445d7","name":"Respond to Webhook","alwaysOutputData":true},{"parameters":{"sessionIdType":"customKey","sessionKey":"12345"},"type":"@n8n/n8n-nodes-langchain.memoryBufferWindow","typeVersion":1.3,"position":[40,200],"id":"b3ed5106-2c8a-45f4-b809-295b0b71abcf","name":"Simple Memory"},{"parameters":{"jsCode":"// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nreturn {\n  message: $input.first().json.output || \"No response from AI\"\n};"},"type":"n8n-nodes-base.code","typeVersion":2,"position":[360,-20],"id":"54bac038-1df3-4307-9c45-f03421a7872b","name":"Code"},{"parameters":{"modelName":"models/gemini-2.0-flash","options":{}},"type":"@n8n/n8n-nodes-langchain.lmChatGoogleGemini","typeVersion":1,"position":[-120,180],"id":"77cb145b-ebbc-42e3-aa92-89b85b1e0bc9","name":"Google Gemini Chat Model","credentials":{"googlePalmApi":{"id":"0CAYgjYDI7R8xwcE","name":"Google Gemini(PaLM) Api account"}}}],"pinData":{},"connections":{"Gmail":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"Webhook":{"main":[[{"node":"AI Agent","type":"main","index":0}]]},"AI Agent":{"main":[[{"node":"Code","type":"main","index":0}]]},"Simple Memory":{"ai_memory":[[{"node":"AI Agent","type":"ai_memory","index":0}]]},"Code":{"main":[[{"node":"Respond to Webhook","type":"main","index":0}]]},"Google Gemini Chat Model":{"ai_languageModel":[[{"node":"AI Agent","type":"ai_languageModel","index":0}]]}},"active":true,"settings":{"executionOrder":"v1"},"versionId":"75132c4b-9a04-4942-a3eb-41307eefa044","meta":{"templateCredsSetupCompleted":true,"instanceId":"c120cfab186612b4e1cc5fa3db0b0db5cf70e67d23ee72e9a63de20c8a268d5a"},"id":"xCAgJleICs5bzi1u","tags":[]}</pre>
+        <ol class="step-list">
+          <li>Click <b>Copy JSON</b> above.</li>
+          <li>Open your <b>n8n</b> instance and go to the workflow canvas.</li>
+          <li>Click the menu (three dots) and select <b>Import from Clipboard</b>, then paste the JSON.</li>
+          <li>Set up your Gmail API credentials in the node (replace <code>YOUR_GMAIL_CREDENTIAL</code>).</li>
+          <li>Save and activate your workflow.</li>
+        </ol>
+        <div class="video-note">
+          <b>Need help?</b> Watch the video guide provided. If you face any issues, refer to the video for troubleshooting steps.
+        </div>
+      </div>
+      <!-- Weather Workflow Card -->
+      <div class="workflow-card">
+        <div class="workflow-icon"><i class="fas fa-cloud-sun"></i></div>
+        <h3>Weather: Get Weather Data Workflow</h3>
+        <p>Fetch current weather data for a specified city using the OpenWeatherMap API. Extend to send notifications or trigger other actions.</p>
+        <div class="workflow-tags">
+          <span class="workflow-tag">Weather</span>
+          <span class="workflow-tag">API</span>
+          <span class="workflow-tag">Automation</span>
+        </div>
+        <button class="copy-btn" onclick="copyToClipboard('weather-json')"><i class="fas fa-copy"></i> Copy JSON</button>
+        <div class="workflow-image">
+          <img src="weather.png" alt="Weather Workflow Diagram" />
+        </div>
+        <p class="code-description">This workflow connects a webhook to an AI Agent with OpenWeatherMap, Wikipedia, and YouTube tools for comprehensive responses.</p>
+        <pre id="weather-json" style="display: none;">{"name":"chat","nodes":[{"parameters":{"promptType":"define","text":"=me {{ $json.body.message }}","options":{}},"type":"@n8n/n8n-nodes-langchain.agent","typeVersion":1.8,"position":[660,0],"id":"503d020e-9e6a-472e-9d38-a4cbd4a684cd","name":"AI Agent"},{"parameters":{"modelName":"models/gemini-2.0-flash","options":{}},"type":"@n8n/n8n-nodes-langchain.lmChatGoogleGemini","typeVersion":1,"position":[540,220],"id":"3797ca99-e3e3-4503-b035-a39ba84e945e","name":"Google Gemini Chat Model","credentials":{"googlePalmApi":{"id":"0CAYgjYDI7R8xwcE","name":"Google Gemini(PaLM) Api account"}}},{"parameters":{"sessionIdType":"customKey","sessionKey":"123456"},"type":"@n8n/n8n-nodes-langchain.memoryBufferWindow","typeVersion":1.3,"position":[740,240],"id":"f5f01fec-f394-4043-9256-119f766481f3","name":"Simple Memory"},{"parameters":{},"type":"@n8n/n8n-nodes-langchain.toolWikipedia","typeVersion":1,"position":[960,240],"id":"53f17537-a505-43d6-9279-c8cf6381cf68","name":"Wikipedia"},{"parameters":{"options":{}},"type":"n8n-nodes-base.respondToWebhook","typeVersion":1.1,"position":[1240,0],"id":"8705af19-5756-4886-952c-ba028be78215","name":"Respond to Webhook","alwaysOutputData":true},{"parameters":{"httpMethod":"POST","path":"rakesh","responseMode":"responseNode","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[240,40],"id":"efb6c70d-7702-44c7-8dd7-b539b1c46ace","name":"Webhook","webhookId":"ec6698cf-6781-4147-ba0d-bcf3df2fa0f5"},{"parameters":{"jsCode":"// Example for JavaScript-based code node\nreturn {\n  message: $input.first().json.output || \"No response from AI\"\n};\n"},"type":"n8n-nodes-base.code","typeVersion":2,"position":[1020,0],"id":"2d65e293-4962-44ce-a8f6-6759d2e4b1ed","name":"Code"},{"parameters":{"cityName":"={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}","language":"en"},"type":"n8n-nodes-base.openWeatherMapTool","typeVersion":1,"position":[1120,220],"id":"78022d93-14d1-43f1-8bee-4d5bad839857","name":"OpenWeatherMap","credentials":{"openWeatherMapApi":{"id":"CMGUGjGVEwEETFiT","name":"OpenWeatherMap account"}}},{"parameters":{"filters":{},"options":{}},"type":"n8n-nodes-base.youTubeTool","typeVersion":1,"position":[1320,220],"id":"8b32d74e-5cc7-455b-b591-bdb8e73c0f8b","name":"YouTube"}],"pinData":{},"connections":{"Google Gemini Chat Model":{"ai_languageModel":[[{"node":"AI Agent","type":"ai_languageModel","index":0}]]},"Simple Memory":{"ai_memory":[[{"node":"AI Agent","type":"ai_memory","index":0}]]},"Wikipedia":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"AI Agent":{"main":[[{"node":"Code","type":"main","index":0}]]},"Webhook":{"main":[[{"node":"AI Agent","type":"main","index":0}]]},"Code":{"main":[[{"node":"Respond to Webhook","type":"main","index":0}]]},"OpenWeatherMap":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"YouTube":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]}},"active":true,"settings":{"executionOrder":"v1","timezone":"Asia/Kolkata","callerPolicy":"workflowsFromSameOwner"},"versionId":"58f6503f-e263-48a8-b5b2-1a0427f19e1b","meta":{"templateCredsSetupCompleted":true,"instanceId":"c120cfab186612b4e1cc5fa3db0b0db5cf70e67d23ee72e9a63de20c8a268d5a"},"id":"uv5ENuAEWpgPrIAy","tags":[]}</pre>
+        <ol class="step-list">
+          <li>Click <b>Copy JSON</b> above.</li>
+          <li>Open your <b>n8n</b> instance and go to the workflow canvas.</li>
+          <li>Click the menu (three dots) and select <b>Import from Clipboard</b>, then paste the JSON.</li>
+          <li>Set your OpenWeatherMap API key in the HTTP Request node (replace <code>YOUR_OPENWEATHER_API_KEY</code>).</li>
+          <li>Save and activate your workflow.</li>
+        </ol>
+        <div class="video-note">
+          <b>Need help?</b> Watch the video guide provided. If you face any issues, refer to the video for troubleshooting steps.
+        </div>
+      </div>
+    </div>
+    <section class="section-header" style="margin-top: 4rem;">
+      <div class="accent-line"></div>
+      <h2>How to Import Workflows</h2>
+      
+      <div class="import-methods">
+        <div class="import-method">
+          <h3><i class="fas fa-file-code"></i> Method 1: Using JSON Code</h3>
+          <ol class="step-list">
+            <li>Copy the workflow JSON for the template you want to use by clicking the <b>Copy JSON</b> button.</li>
+            <li>In your n8n workflow canvas, click the menu (three dots) and select <b>Import from Clipboard</b>.</li>
+            <li>Paste the JSON and confirm.</li>
+            <li>Set up any required API credentials or keys as described in the workflow instructions.</li>
+            <li>Save and activate your workflow.</li>
+          </ol>
+        </div>
+        
+        <div class="import-method">
+          <h3><i class="fas fa-copy"></i> Method 2: Within n8n Interface</h3>
+          <ol class="step-list">
+            <li>Locate the template you want to use in the n8n template library.</li>
+            <li>Select the nodes you want to copy by dragging a selection box around them.</li>
+            <li>Use keyboard shortcut <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> on Mac) to copy the selected nodes.</li>
+            <li>Create a new workflow or open an existing one where you want to paste the nodes.</li>
+            <li>Use keyboard shortcut <kbd>Ctrl</kbd>+<kbd>V</kbd> (or <kbd>⌘</kbd>+<kbd>V</kbd> on Mac) to paste the nodes.</li>
+            <li>Adjust node positions and connections as needed.</li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="tips-container">
+        <h3><i class="fas fa-star"></i> Pro Tips</h3>
+        <ul class="tips-list">
+          <li>When importing JSON, make sure to replace any placeholder API keys or credentials with your own.</li>
+          <li>After importing, test each node individually to ensure proper configuration.</li>
+          <li>You can modify the imported workflow to suit your specific needs by adding or removing nodes.</li>
+          <li>Save your workflow frequently while making changes to avoid losing your work.</li>
+        </ul>
+      </div>
+    </section>
+    
+    <div class="video-note" style="margin-top: 2rem;">
+      <i class="fas fa-lightbulb" style="margin-right: 0.5rem; color: var(--primary);"></i>
+      <b>Still have trouble?</b> Watch the provided video guides for step-by-step troubleshooting and setup.
+    </div>
+    
+    <section class="video-tutorials-section">
+      <h2>Video Tutorials</h2>
+      <div class="video-tutorials-grid">
+        <div class="video-tutorial-card">
+          <div class="video-thumbnail">
+            <a href="https://youtu.be/XTVGL5UYCjo?si=kn0KPONvhfdOrnW4" target="_blank">
+              <img src="https://img.youtube.com/vi/XTVGL5UYCjo/maxresdefault.jpg" alt="n8n Workflow Tutorial">
+              <div class="play-button"><i class="fas fa-play"></i></div>
+            </a>
+          </div>
+          <h3>Get Started With Google OAuth</h3>
+          <p>Learn how to set up and configure Google OAuth credentials for your n8n workflows.</p>
+        </div>
+        
+        <div class="video-tutorial-card">
+          <div class="video-thumbnail">
+            <a href="https://youtu.be/dpgyciO1xlA?si=Ql0i9fl6tGjJo28k" target="_blank">
+              <img src="https://img.youtube.com/vi/dpgyciO1xlA/maxresdefault.jpg" alt="Advanced n8n AI Integration">
+              <div class="play-button"><i class="fas fa-play"></i></div>
+            </a>
+          </div>
+          <h3>Get Your API Key for OpenWeather</h3>
+          <p>Step-by-step guide on how to obtain and configure an API key for the OpenWeather service in n8n.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div>&copy; 2025 Deep AI — Workflow Templates for n8n</div>
+    <div style="margin-top: 0.5rem;">Empowering your automation journey</div>
+  </footer>
+  
+  <!-- Success Message Notification -->
+  <div id="success-message" class="success-message">
+    <i class="fas fa-check-circle"></i>
+    <span>Workflow JSON copied to clipboard!</span>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script>
+    // Add animation to workflow cards on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.workflow-card');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 100 * index);
+      });
+    });
+    
+    // Improved copy to clipboard function with animated notification
+    function copyToClipboard(id) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.textContent).then(() => {
+        const successMessage = document.getElementById('success-message');
+        successMessage.classList.add('show');
+        
+        setTimeout(() => {
+          successMessage.classList.remove('show');
+        }, 3000);
+      });
+    }
+    
+    // Add smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 100,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
