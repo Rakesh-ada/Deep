@@ -1,16 +1,5 @@
 # Deep AI Chat
 
-## Quick Start
-
-1. Open your terminal in this project directory.
-2. Paste the following commands:
-   ```sh
-   npm install
-   npm start
-   ```
-3. The application will launch.
-
-
 A floating chat interface desktop application using n8n for workflow automation and Google Gemini AI.
 
 ## Important Note About n8n
@@ -90,7 +79,7 @@ You don't need to manually install or start n8n - the application handles this a
 - [Node.js](https://nodejs.org/) (version 16 or higher)
 - npm (included with Node.js)
 
-### Manual Installation (Recommended)
+### Manual Installation (if quick start fail)
 
 1. **Install Electron (large download, do this first!):**
    ```
@@ -134,7 +123,7 @@ This command will:
 3. Start n8n in the background (if not already running)
 4. Launch the chat interface
 
-## Building the Application
+## Building the Application(Not Working)
 
 To create a standalone executable:
 
