@@ -404,12 +404,45 @@
     <div class="installation-container">
       <div class="installation-tabs">
         <button class="tab-btn active" data-tab="prerequisites">Prerequisites</button>
-        <button class="tab-btn" data-tab="automatic">Automatic Install</button>
-        <button class="tab-btn" data-tab="manual">Manual Install</button>
-        <button class="tab-btn" data-tab="running">Running</button>
+        <button class="tab-btn" data-tab="quickstart">Quick Start</button>
       </div>
       
       <div class="installation-content">
+        <div class="tab-content" id="quickstart-tab">
+          <div class="installation-steps">
+            <div class="installation-step">
+              <div class="step-number">1</div>
+              <div class="step-details">
+                <h3>Open your terminal in this project directory</h3>
+                <p>Navigate to the Deep AI project directory in your terminal or command prompt.</p>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">2</div>
+              <div class="step-details">
+                <h3>Run the following commands</h3>
+                <div class="code-block">
+                  <pre><code>npm install
+npm start</code></pre>
+                </div>
+              </div>
+            </div>
+            
+            <div class="installation-step">
+              <div class="step-number">3</div>
+              <div class="step-details">
+                <h3>The application will launch</h3>
+                <p>Deep AI will automatically install all dependencies and start the application.</p>
+                <div class="important-note" style="background: rgba(0, 240, 255, 0.1); border-left: 4px solid var(--primary); margin-top: 15px;">
+                  <i class="fas fa-exclamation-triangle" style="color: var(--primary); margin-right: 8px;"></i>
+                  <strong>Important:</strong> You don't need to manually install or start n8n - the application handles this automatically!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div class="tab-content active" id="prerequisites-tab">
           <div class="installation-steps">
             <div class="installation-step">
@@ -437,123 +470,10 @@
                 <h3>Extract the files</h3>
                 <p>Extract the downloaded zip file to a location of your choice.</p>
                 <p class="note">Make sure you have sufficient permissions for the directory where you extract the files.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="tab-content" id="automatic-tab">
-          <div class="installation-steps">
-            <div class="installation-step">
-              <div class="step-number">1</div>
-              <div class="step-details">
-                <h3>Windows Installation</h3>
-                <p>For Windows users, simply double-click the included installation batch file.</p>
-                <div class="code-block">
-                  <pre><code>Double-click install.bat</code></pre>
+                <div class="important-note" style="background: rgba(0, 240, 255, 0.1); border-left: 4px solid var(--primary); margin-top: 15px; text-align: left;">
+                  <i class="fas fa-arrow-right" style="color: var(--primary); margin-right: 8px;"></i>
+                  <strong>Next:</strong> After completing these prerequisites, follow the Quick Start guide to install and run the application.
                 </div>
-              </div>
-            </div>
-            
-            <div class="installation-step">
-              <div class="step-number">2</div>
-              <div class="step-details">
-                <h3>macOS/Linux Installation</h3>
-                <p>For macOS and Linux users, open a terminal in the project directory and run:</p>
-                <div class="code-block">
-                  <pre><code>chmod +x install.sh
-./install.sh</code></pre>
-                </div>
-              </div>
-            </div>
-            
-            <div class="installation-step">
-              <div class="step-number">3</div>
-              <div class="step-details">
-                <h3>Verification</h3>
-                <p>The installer will automatically check and install all required dependencies.</p>
-                <p class="note">The installation includes Electron, n8n, Google Cloud Speech API, Google Generative AI (Gemini model), SQLite3, and other required packages.</p>
-                <p class="important-note"><i class="fas fa-info-circle"></i> <strong>Important:</strong> You don't need to manually install or start n8n - the application handles this automatically!</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="tab-content" id="manual-tab">
-          <div class="installation-steps">
-            <div class="installation-step">
-              <div class="step-number">1</div>
-              <div class="step-details">
-                <h3>Open Terminal/Command Prompt</h3>
-                <p>Navigate to the project directory in your terminal or command prompt.</p>
-                <div class="code-block">
-                  <pre><code>cd path/to/deep-ai</code></pre>
-                </div>
-              </div>
-            </div>
-            
-            <div class="installation-step">
-              <div class="step-number">2</div>
-              <div class="step-details">
-                <h3>Install Electron First</h3>
-                <p>Electron is a large download (over 250 MB), so it's recommended to install it first:</p>
-                <div class="code-block">
-                  <pre><code>node install-electron.js</code></pre>
-                </div>
-                <p class="note">This may take several minutes due to Electron's large size.</p>
-              </div>
-            </div>
-            
-            <div class="installation-step">
-              <div class="step-number">3</div>
-              <div class="step-details">
-                <h3>Install All Other Dependencies</h3>
-                <p>After Electron is installed, run the dependencies installer script:</p>
-                <div class="code-block">
-                  <pre><code>node install-dependencies.js</code></pre>
-                </div>
-                <p class="note">If your install is interrupted or fails, try running the scripts again. A slow or unstable internet connection may cause delays.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="tab-content" id="running-tab">
-          <div class="installation-steps">
-            <div class="installation-step">
-              <div class="step-number">1</div>
-              <div class="step-details">
-                <h3>Start the Application</h3>
-                <p>After installation, run the application using npm:</p>
-                <div class="code-block">
-                  <pre><code>npm start</code></pre>
-                </div>
-              </div>
-            </div>
-            
-            <div class="installation-step">
-              <div class="step-number">2</div>
-              <div class="step-details">
-                <h3>Configure Settings</h3>
-                <p>On first launch, click the gear icon to access settings.</p>
-                <p>The application works with n8n in two ways:</p>
-                <ul class="feature-list">
-                  <li><strong>Integrated Mode:</strong> The app will automatically start n8n when launched, and stop it when closed</li>
-                  <li><strong>External Mode:</strong> If n8n is already running (e.g., you started it separately with <code>npx n8n start</code>), the app will detect and connect to it automatically</li>
-                </ul>
-                <p class="note">The application will automatically use Gemini AI if n8n is not configured or unavailable.</p>
-              </div>
-            </div>
-            
-            <div class="installation-step">
-              <div class="step-number">3</div>
-              <div class="step-details">
-                <h3>Build Standalone Application (Optional)</h3>
-                <p>To create a standalone executable:</p>
-                <div class="code-block">
-                  <pre><code>npm run build</code></pre>
-                </div>
-                <p>This will create an installer in the <code>dist</code> folder and a portable executable for distribution.</p>
               </div>
             </div>
           </div>

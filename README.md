@@ -1,5 +1,16 @@
 # Deep AI Chat
 
+## Quick Start
+
+1. Open your terminal in this project directory.
+2. Paste the following commands:
+   ```sh
+   npm install
+   npm start
+   ```
+3. The application will launch.
+
+
 A floating chat interface desktop application using n8n for workflow automation and Google Gemini AI.
 
 ## Important Note About n8n
@@ -35,6 +46,17 @@ You don't need to manually install or start n8n - the application handles this a
 
 ### Installation & Deployment
 - **Dependency Management**: Automatic installation of all required packages
+
+#### Quick Start (Terminal)
+
+1. Open your terminal in this project directory.
+2. Run the following commands:
+   ```sh
+   npm install
+   npm start
+   ```
+3. The application will launch.
+
 - **Cross-Platform**: Works on Windows, macOS, and Linux systems
 - **Portable Option**: Create a single executable that runs without installation
 - **Installer Package**: Option to create a standard installer for proper system integration
