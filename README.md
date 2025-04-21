@@ -13,8 +13,8 @@ A floating, always-on-top desktop chat app powered by Google Gemini AI and n8n a
 1. **Install Node.js 16+** ([Download](https://nodejs.org/))
 2. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/deep-ai-chat.git
-   cd deep-ai-chat
+   git clone https://github.com/Rakesh-ada/Deep.git
+   cd Deep
    ```
 3. **Install dependencies and launch:**
    ```bash
@@ -91,7 +91,7 @@ A floating, always-on-top desktop chat app powered by Google Gemini AI and n8n a
 
 ### Automatic Setup
 ```bash
-git clone https://github.com/your-username/deep-ai-chat.git
+git clone https://github.com/Rakesh-ada/Deep.git
 cd Deep
 npm install
 npm start
