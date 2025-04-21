@@ -92,7 +92,7 @@ A floating, always-on-top desktop chat app powered by Google Gemini AI and n8n a
 ### Automatic Setup
 ```bash
 git clone https://github.com/your-username/deep-ai-chat.git
-cd deep-ai-chat
+cd Deep
 npm install
 npm start
 ```
