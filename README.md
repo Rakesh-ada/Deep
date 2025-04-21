@@ -1,42 +1,79 @@
 # Deep AI Chat
 
-A floating chat interface desktop application using n8n for workflow automation and Google Gemini AI.
+![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macOS%20%7C%20linux-blue)
+![Node Version](https://img.shields.io/badge/node.js-16%2B-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-## Important Note About n8n
+A floating, always-on-top desktop chat app powered by Google Gemini AI and n8n automation. Stay productive with a modern AI assistant that understands text and voice, handles automation, and looks good while doing it.
 
-This application can work with n8n in two ways:
-1. **Integrated Mode**: The app will automatically start n8n when launched, and stop it when closed
-2. **External Mode**: If n8n is already running (e.g., you started it separately with `npx n8n start`), the app will detect and connect to it automatically
+---
 
-You don't need to manually install or start n8n - the application handles this automatically!
+## 🚀 Quick Start
 
-## Detailed Features
+1. **Install Node.js 16+** ([Download](https://nodejs.org/))
+2. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/deep-ai-chat.git
+   cd deep-ai-chat
+   ```
+3. **Install dependencies and launch:**
+   ```bash
+   npm install
+   npm start
+   ```
+   The app will:
+   - Install required dependencies
+   - Check and install n8n (if not already present)
+   - Start n8n in the background
+   - Launch the floating AI chat interface
 
-### Intelligent Chat Interface
-- **Floating Window**: Always-on-top chat interface that stays accessible while using other applications
-- **Resizable & Minimizable**: Expand for full conversations or minimize to a compact bar
-- **Elegant UI**: Modern, clean design with smooth animations and visual feedback
-- **Message History**: Stores your conversation for context and reference
-- **Copy Functionality**: Easily copy any message with a single click
+---
 
-### Dual AI Backend System
-- **n8n Integration**: Connect to custom n8n workflows for complete automation flexibility
-- **Gemini 2.0 Flash**: Automatic fallback to Google's powerful Gemini AI when n8n is unavailable
-- **Status Indicators**: Visual feedback shows connection status (blue for n8n, purple for Gemini)
-- **Smart Failover**: Seamlessly switches between backends without disrupting the user experience
-- **Real-time Status**: Shows when the system is processing or waiting for input
+## 💡 How It Works
 
-### Voice Capabilities
-- **Speech Recognition**: Record and transcribe voice inputs using Google's Speech-to-Text API
-- **Text-to-Speech**: AI responses can be read aloud with natural-sounding voice
-- **Voice Gender Selection**: Choose between male and female voice options
-- **Recording Controls**: Simple microphone interface with visual feedback during recording
-- **Automatic Timeout**: Recording stops automatically after silence is detected
+- **Integrated n8n:** App auto-starts n8n and connects, or uses your running n8n instance.
+- **Dual AI Engine:** Switches between n8n (automation) and Google Gemini (natural language) for best results.
+- **No manual n8n setup required!**
 
-### Installation & Deployment
-- **Dependency Management**: Automatic installation of all required packages
+---
 
-#### Quick Start (Terminal)
+
+## ✨ Features
+
+### 🪟 Floating Chat Interface
+- Always-on-top, resizable, and minimizable
+- Modern, animated UI
+- Message history with one-click copy
+
+### 🤖 Dual AI Engine
+- **n8n AI:** Automation and custom workflows
+- **Google Gemini AI:** Natural language understanding (fallback)
+- **Smart Switching:** Automatic failover and status lights (🔵 n8n, 🟣 Gemini)
+
+### 🎤 Voice Capabilities
+- Google Speech-to-Text for voice input
+- Text-to-Speech with male/female voices
+- Visual mic controls and auto-timeout
+
+### ⚙️ Configuration
+- In-app settings (gear icon)
+- Set n8n webhook URL or use Gemini fallback
+
+### 🛠️ Build & Distribution
+- Cross-platform: Windows, macOS, Linux
+- Build installer or portable executable (`npm run build`)
+
+### 🧑‍💻 Developer Tools
+- Real-time logs, modular code, IPC
+- Auto repair for dependencies
+
+### 🔐 Security & Privacy
+- No telemetry or tracking
+- Local voice fallback
+- Visual network indicators
+
+---
+
 
 1. Open your terminal in this project directory.
 2. Run the following commands:
@@ -46,112 +83,68 @@ You don't need to manually install or start n8n - the application handles this a
    ```
 3. The application will launch.
 
-- **Cross-Platform**: Works on Windows, macOS, and Linux systems
-- **Portable Option**: Create a single executable that runs without installation
-- **Installer Package**: Option to create a standard installer for proper system integration
-- **Automatic Updates**: Easy way to check for and install updates
+## 🖥️ Installation
 
-### Advanced Configuration
-- **Settings Interface**: Simple UI for configuring all aspects of the application
-- **Connection Testing**: Built-in webhook testing to verify n8n connectivity
-- **API Failover Options**: Configure how the system prioritizes different AI backends
-- **Voice Settings**: Customize speech recognition and synthesis parameters
-- **Appearance Options**: Adjust the application's look and behavior
+### Requirements
+- [Node.js 16+](https://nodejs.org/)
+- npm (bundled with Node.js)
 
-### Developer-Friendly
-- **Error Handling**: Comprehensive error reporting and graceful degradation
-- **Logging**: Detailed console logs for troubleshooting and development
-- **Well-Organized Code**: Clean, modular structure for easy modification
-- **Robust IPC**: Efficient communication between renderer and main processes
-- **Dependency Checking**: Runtime verification of requirements with automatic repair
-
-### Security & Privacy
-- **Local Processing**: Voice recognition with local fallback options
-- **Isolated Context**: Application runs in its own environment for better security
-- **No Telemetry**: No data collection or usage tracking
-- **Transparent Connections**: Clear indication of where data is being sent
-- **Configurable Endpoints**: Control which external services the app connects to
-
-## Installation
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (version 16 or higher)
-- npm (included with Node.js)
-
-### Manual Installation (if quick start fail)
-
-1. **Install Electron (large download, do this first!):**
-   ```
-   node install-electron.js
-   ```
-2. **Install all other dependencies:**
-   ```
-   node install-dependencies.js
-   ```
-   - You must run both scripts from the project directory.
-   - Installing Electron may take several minutes due to its large size (over 250 MB).
-   - All other dependencies will install quickly in comparison.
-
-**Troubleshooting:**
-- If your install is interrupted or fails, try running the scripts again.
-- A slow or unstable internet connection may cause Electron to take longer to download.
-
-
-### Dependencies
-
-The installation scripts will ensure all required dependencies are installed:
-
-- Electron (UI framework)
-- n8n (workflow automation)
-- Google Cloud Speech API (voice recognition)
-- Google Generative AI (Gemini model)
-- SQLite3 (local storage)
-- Other required packages
-
-## Running the Application
-
-After installation, simply run the application with:
-
+### Automatic Setup
 ```bash
+git clone https://github.com/your-username/deep-ai-chat.git
+cd deep-ai-chat
+npm install
 npm start
 ```
 
-This command will:
-1. Check for and install any missing dependencies
-2. Verify if n8n is installed and install it if needed
-3. Start n8n in the background (if not already running)
-4. Launch the chat interface
-
-## Building the Application(Not Working)
-
-To create a standalone executable:
-
+### Manual Setup (if auto-install fails)
+```bash
+node install-electron.js          # Downloads Electron (~250MB)
+node install-dependencies.js      # Installs other dependencies
+npm start
 ```
+
+---
+
+## 🏗️ Build for Distribution
+
+```bash
 npm run build
 ```
+Creates an installer and a portable executable in the `dist/` folder.
 
-This will create:
-- An installer in the `dist` folder
-- A portable executable for distribution without installation
+---
 
-## Configuration
+## ⚙️ Configuration
+- Launch the app and click the gear icon (⚙️) to open settings.
+- Enter your n8n Webhook URL (optional, for custom workflows).
+- The app will use Gemini AI if n8n is unavailable.
 
-1. On first launch, click the gear icon to access settings
-2. Configure your n8n webhook URL if you're using n8n
-3. The application will automatically use Gemini AI if n8n is not configured
+---
 
-## Troubleshooting
+## 🩺 Troubleshooting
+| Problem                  | Solution                                               |
+|--------------------------|--------------------------------------------------------|
+| n8n not connecting       | Check if webhook URL is correct in settings            |
+| App won’t start          | Re-run `node install-electron.js` and `install-dependencies.js` |
+| Voice not working        | Ensure microphone permissions are enabled              |
+| Build fails              | Delete `dist/` and try `npm run build` again          |
 
-- If you encounter missing dependency errors, run the installer again
-- For n8n connection issues, ensure n8n is running and your webhook URL is correct
-- Check the application logs for detailed error messages
+---
 
-## Acknowledgments
+## 📦 Dependencies
+- Electron (UI framework)
+- n8n (workflow automation)
+- Google Gemini (Generative AI)
+- Google Cloud Speech API (voice recognition)
+- SQLite3 (local storage)
 
-This project uses and is inspired by the amazing open-source project [n8n](https://n8n.io/).
+---
 
-- [n8n GitHub Repository](https://github.com/n8n-io/n8n)
+## 🙌 Credits
+Built with ❤️ using [n8n](https://n8n.io/) and Google AI.
+
+- [n8n GitHub](https://github.com/n8n-io/n8n)
 - [n8n Official Website](https://n8n.io/)
 
 We thank the n8n team and community for their outstanding work in workflow automation!
