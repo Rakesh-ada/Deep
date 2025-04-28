@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
   chatPopup.style.display = 'none';
   
   // Gemini API Key
-  const API_KEY = "AIzaSyDjonLXdO1u8KdXllXSiAsZB0VFXG2iRbU";
+  const API_KEY = ;
   
   // Event Listeners
   chatBtn.addEventListener('click', function(e) {
