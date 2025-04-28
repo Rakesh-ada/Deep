@@ -7,7 +7,7 @@ const speech = require('@google-cloud/speech');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Google API key
-const GOOGLE_API_KEY = 'AIzaSyDG6ln6ljylsBOFmTmIgG9_Y2IkpInRZ84';
+const GOOGLE_API_KEY = ;
 
 // Initialize the Gemini API
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
