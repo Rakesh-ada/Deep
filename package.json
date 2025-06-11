@@ -62,8 +62,14 @@
     }
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.2.0",
     "@google-cloud/speech": "^7.0.1",
     "@google/generative-ai": "^0.2.1",
+    "audify": "^1.9.0",
+    "axios": "^1.9.0",
+    "electron-store": "^10.0.1",
+    "elevenlabs": "^1.59.0",
+    "form-data": "^4.0.3",
     "googleapis": "^148.0.0",
     "node-fetch": "^2.7.0",
     "sqlite3": "^5.1.7"

@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   minimizeWindow: () => ipcRenderer.invoke('minimize-window'),
@@ -22,7 +22,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   textToSpeech: (text, voiceGender) => ipcRenderer.invoke('text-to-speech', text, voiceGender),
   
   // Add app termination function
-  quitApp: () => ipcRenderer.invoke('quit-app')
+  quitApp: () => ipcRenderer.invoke('quit-app'),
+  
+  // API key management
+  getApiKey: (service) => ipcRenderer.invoke('get-api-key', service),
+  setApiKey: (service, apiKey) => ipcRenderer.invoke('set-api-key', service, apiKey),
+  
+  // ElevenLabs API functions
+  elevenLabsTTS: (text, voiceId) => ipcRenderer.invoke('elevenlabs-tts', text, voiceId),
+  elevenLabsSTT: (audioBuffer) => ipcRenderer.invoke('elevenlabs-stt', audioBuffer),
+  elevenLabsGetVoices: () => ipcRenderer.invoke('elevenlabs-get-voices')
 });
 
 // Listen for n8n started event

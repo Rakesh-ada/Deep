@@ -47,36 +47,34 @@
           <label for="webhook-url">n8n Webhook URL</label>
           <input type="url" id="webhook-url" placeholder="https://your-n8n-instance.com/webhook/your-workflow-id" required>
           <small>The webhook URL that connects this assistant to your n8n workflow.</small>
-          </div>
+        </div>
         
         <div class="form-group">
           <label>Speech Recognition</label>
           <div class="toggle-container">
-            <input type="checkbox" id="use-google-api" class="toggle-checkbox">
-            <label for="use-google-api" class="toggle-label"></label>
-            <span id="api-label">Using Browser Recognition (Free)</span>
-        </div>
-          <small>Toggle between browser's built-in speech recognition (free) and Google's Speech-to-Text API (paid).</small>
+            <input type="checkbox" id="use-elevenlabs" class="toggle-checkbox" checked>
+            <label for="use-elevenlabs" class="toggle-label"></label>
+            <span id="stt-provider-label">Using ElevenLabs STT</span>
+          </div>
+          <small>Toggle between browser's built-in speech recognition (free) and ElevenLabs Speech-to-Text.</small>
         </div>
         
         <div class="form-group">
           <label>Text-to-Speech</label>
           <div class="toggle-container">
-            <input type="checkbox" id="enable-tts" class="toggle-checkbox">
+            <input type="checkbox" id="enable-tts" class="toggle-checkbox" checked>
             <label for="enable-tts" class="toggle-label"></label>
-            <span id="tts-label">Text-to-Speech Disabled</span>
+            <span id="tts-label">Text-to-Speech Enabled</span>
           </div>
-          <small>Enable or disable text-to-speech for assistant responses. Uses Google's Text-to-Speech API (paid).</small>
+          <small>Enable or disable ElevenLabs text-to-speech for assistant responses.</small>
         </div>
         
-        <div class="form-group">
-          <label>Voice Gender</label>
-          <div class="toggle-container">
-            <input type="checkbox" id="voice-gender" class="toggle-checkbox">
-            <label for="voice-gender" class="toggle-label"></label>
-            <span id="voice-gender-label">Female Voice</span>
-          </div>
-          <small>Toggle between female (default) and male voice for the assistant.</small>
+        <div class="form-group elevenlabs-settings">
+          <label for="elevenlabs-voice">ElevenLabs Voice</label>
+          <select id="elevenlabs-voice" class="form-select">
+            <option value="loading">Loading voices...</option>
+          </select>
+          <small>Select a voice from your ElevenLabs account.</small>
         </div>
         
         <div class="form-group">
@@ -87,6 +85,18 @@
             <span id="nav-link-label">Navigation Link Disabled</span>
           </div>
           <small>Enable or disable navigation link to the workflow templates page.</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="google-api-key">Gemini API Key</label>
+          <input type="password" id="google-api-key" placeholder="Enter your Gemini API key">
+          <small>Your API key for Gemini AI.</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="elevenlabs-api-key">ElevenLabs API Key</label>
+          <input type="password" id="elevenlabs-api-key" placeholder="Enter your ElevenLabs API key">
+          <small>Your ElevenLabs API key for advanced Speech-to-Text and Text-to-Speech.</small>
         </div>
         
         <div class="form-buttons">
@@ -335,22 +345,26 @@
     
     // Save n8n settings
     const n8nSettingsForm = document.getElementById('n8n-settings-form');
-    const useGoogleApiToggle = document.getElementById('use-google-api');
-    const apiLabel = document.getElementById('api-label');
+    const useElevenLabsToggle = document.getElementById('use-elevenlabs');
+    const sttProviderLabel = document.getElementById('stt-provider-label');
     const enableTtsToggle = document.getElementById('enable-tts');
     const ttsLabel = document.getElementById('tts-label');
-    const voiceGenderToggle = document.getElementById('voice-gender');
-    const voiceGenderLabel = document.getElementById('voice-gender-label');
+    const elevenLabsVoiceSelect = document.getElementById('elevenlabs-voice');
+    const googleApiKeyInput = document.getElementById('google-api-key');
+    const elevenLabsApiKeyInput = document.getElementById('elevenlabs-api-key');
     
     // Add audio element for TTS playback
     const ttsAudio = document.createElement('audio');
     document.body.appendChild(ttsAudio);
     
     // Load settings on page load
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       loadSpeechRecognitionSettings();
       loadTextToSpeechSettings();
-      loadVoiceGenderSettings();
+      loadApiKeys();
+      
+      // Load ElevenLabs voices
+      await loadElevenLabsVoices();
     });
     
     // Load speech recognition preference
@@ -358,8 +372,15 @@
       const savedSettings = localStorage.getItem('speechRecognitionSettings');
       if (savedSettings) {
         const settings = JSON.parse(savedSettings);
-        useGoogleApiToggle.checked = settings.useGoogleApi;
-        updateApiLabel();
+        useElevenLabsToggle.checked = settings.useElevenLabsSTT;
+        updateSttProviderLabel();
+      } else {
+        // Default to using ElevenLabs
+        localStorage.setItem('speechRecognitionSettings', JSON.stringify({
+          useElevenLabsSTT: true
+        }));
+        useElevenLabsToggle.checked = true;
+        updateSttProviderLabel();
       }
     };
     
@@ -370,27 +391,104 @@
         const settings = JSON.parse(savedSettings);
         enableTtsToggle.checked = settings.enableTts;
         updateTtsLabel();
-      }
-    };
-
-    // Load voice gender preference
-    const loadVoiceGenderSettings = () => {
-      const savedSettings = localStorage.getItem('voiceGenderSettings');
-      if (savedSettings) {
-        const settings = JSON.parse(savedSettings);
-        voiceGenderToggle.checked = settings.useMaleVoice;
-        updateVoiceGenderLabel();
+      } else {
+        // Default to enabled
+        localStorage.setItem('textToSpeechSettings', JSON.stringify({
+          enableTts: true
+        }));
+        enableTtsToggle.checked = true;
+        updateTtsLabel();
       }
     };
     
-    // Update the label based on the toggle state
-    const updateApiLabel = () => {
-      if (useGoogleApiToggle.checked) {
-        apiLabel.textContent = 'Using Google API (Paid)';
-        apiLabel.style.color = '#00DCD4';
+    // Load API keys from electron store
+    const loadApiKeys = async () => {
+      try {
+        // Get Google API key
+        const googleApiKey = await window.electronAPI.getApiKey('google');
+        if (googleApiKey) {
+          googleApiKeyInput.value = googleApiKey;
+        }
+        
+        // Get ElevenLabs API key
+        const elevenLabsApiKey = await window.electronAPI.getApiKey('elevenlabs');
+        if (elevenLabsApiKey) {
+          elevenLabsApiKeyInput.value = elevenLabsApiKey;
+        }
+      } catch (error) {
+        console.error('Error loading API keys:', error);
+      }
+    };
+    
+    // Load ElevenLabs voices
+    const loadElevenLabsVoices = async () => {
+      try {
+        // Show loading state
+        elevenLabsVoiceSelect.innerHTML = '<option value="loading">Loading voices...</option>';
+        
+        // Get voices from ElevenLabs
+        const result = await window.electronAPI.elevenLabsGetVoices();
+        
+        if (result.success && result.voices) {
+          // Clear the select
+          elevenLabsVoiceSelect.innerHTML = '';
+          
+          // Add each voice as an option
+          result.voices.forEach(voice => {
+            const option = document.createElement('option');
+            option.value = voice.voice_id;
+            option.textContent = voice.name;
+            elevenLabsVoiceSelect.appendChild(option);
+          });
+          
+          // Select the saved voice if available
+          const savedSettings = localStorage.getItem('elevenLabsVoiceSettings');
+          if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            if (settings.voiceId) {
+              elevenLabsVoiceSelect.value = settings.voiceId;
+            }
+          } else {
+            // Default to the first voice
+            if (result.voices.length > 0) {
+              localStorage.setItem('elevenLabsVoiceSettings', JSON.stringify({
+                voiceId: result.voices[0].voice_id
+              }));
+            }
+          }
+        } else {
+          // Show error
+          elevenLabsVoiceSelect.innerHTML = '<option value="">Failed to load voices</option>';
+          console.error('Failed to load ElevenLabs voices:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading ElevenLabs voices:', error);
+        elevenLabsVoiceSelect.innerHTML = '<option value="">Failed to load voices</option>';
+      }
+    };
+    
+    // Toggle ElevenLabs settings visibility
+    const toggleElevenLabsSettings = () => {
+      const elevenLabsSettings = document.querySelector('.elevenlabs-settings');
+      const googleVoiceSettings = document.querySelector('.google-voice-settings');
+      
+      if (useElevenLabsToggle.checked) {
+        elevenLabsSettings.style.display = 'block';
+        googleVoiceSettings.style.display = 'none';
       } else {
-        apiLabel.textContent = 'Using Browser Recognition (Free)';
-        apiLabel.style.color = '#DDD';
+        elevenLabsSettings.style.display = 'none';
+        googleVoiceSettings.style.display = 'block';
+      }
+    };
+    
+    // Update the STT provider label based on the toggle state
+    const updateSttProviderLabel = () => {
+      if (useElevenLabsToggle.checked) {
+        sttProviderLabel.textContent = 'Using ElevenLabs STT';
+        sttProviderLabel.style.color = '#00DCD4';
+      } else {
+        sttProviderLabel.textContent = 'Using Browser Recognition (Free)';
+        sttProviderLabel.style.color = '#DDD';
       }
     };
     
@@ -404,30 +502,19 @@
         ttsLabel.style.color = '#DDD';
       }
     };
-
-    // Update the voice gender label based on the toggle state
-    const updateVoiceGenderLabel = () => {
-      if (voiceGenderToggle.checked) {
-        voiceGenderLabel.textContent = 'Male Voice';
-        voiceGenderLabel.style.color = '#00DCD4';
-      } else {
-        voiceGenderLabel.textContent = 'Female Voice';
-        voiceGenderLabel.style.color = '#DDD';
-      }
-    };
     
     // Event listener for STT toggle change
-    useGoogleApiToggle.addEventListener('change', () => {
-      updateApiLabel();
+    useElevenLabsToggle.addEventListener('change', () => {
+      updateSttProviderLabel();
       
       // Save the setting
       localStorage.setItem('speechRecognitionSettings', JSON.stringify({
-        useGoogleApi: useGoogleApiToggle.checked
+        useElevenLabsSTT: useElevenLabsToggle.checked
       }));
       
       // Show message about the change
-      const message = useGoogleApiToggle.checked ? 
-        'Switched to Google Speech-to-Text API (paid). Higher accuracy but usage is billed.' : 
+      const message = useElevenLabsToggle.checked ? 
+        'Switched to ElevenLabs Speech-to-Text. Higher accuracy with advanced voice recognition.' : 
         'Switched to browser speech recognition (free). May be less accurate but has no cost.';
       
       addMessage(message, false);
@@ -444,7 +531,7 @@
       
       // Show message about the change
       const message = enableTtsToggle.checked ? 
-        'Text-to-speech enabled. Assistant responses will be spoken aloud.' : 
+        'ElevenLabs text-to-speech enabled. Assistant responses will be spoken aloud.' : 
         'Text-to-speech disabled. Assistant responses will be text only.';
       
       addMessage(message, false);
@@ -454,30 +541,48 @@
         speakText(message);
       }
     });
-
-    // Event listener for voice gender toggle change
-    voiceGenderToggle.addEventListener('change', () => {
-      updateVoiceGenderLabel();
-      
+    
+    // Event listener for ElevenLabs voice change
+    elevenLabsVoiceSelect.addEventListener('change', () => {
       // Save the setting
-      localStorage.setItem('voiceGenderSettings', JSON.stringify({
-        useMaleVoice: voiceGenderToggle.checked
+      localStorage.setItem('elevenLabsVoiceSettings', JSON.stringify({
+        voiceId: elevenLabsVoiceSelect.value
       }));
       
-      // Show message about the change
-      const message = voiceGenderToggle.checked ? 
-        'Switched to male voice for the assistant.' : 
-        'Switched to female voice for the assistant.';
-      
-      addMessage(message, false);
-      
-      // If TTS is enabled, speak the message as a test
+      // If TTS is enabled, speak a test message
       if (enableTtsToggle.checked) {
+        const message = `This is a test of the selected voice.`;
         speakText(message);
       }
     });
     
-    // Function to speak text using Google's Text-to-Speech API
+    // Event listener for API key inputs
+    googleApiKeyInput.addEventListener('change', async () => {
+      try {
+        await window.electronAPI.setApiKey('google', googleApiKeyInput.value);
+        addMessage('Google API key saved successfully.', false);
+      } catch (error) {
+        console.error('Error saving Google API key:', error);
+        addMessage('Error saving Google API key. Please try again.', false);
+      }
+    });
+    
+    elevenLabsApiKeyInput.addEventListener('change', async () => {
+      try {
+        await window.electronAPI.setApiKey('elevenlabs', elevenLabsApiKeyInput.value);
+        addMessage('ElevenLabs API key saved successfully.', false);
+        
+        // Reload voices if using ElevenLabs
+        if (useElevenLabsToggle.checked) {
+          await loadElevenLabsVoices();
+        }
+      } catch (error) {
+        console.error('Error saving ElevenLabs API key:', error);
+        addMessage('Error saving ElevenLabs API key. Please try again.', false);
+      }
+    });
+    
+        // Function to speak text using the selected TTS provider
     async function speakText(text) {
       try {
         // Check if TTS is enabled
@@ -488,26 +593,45 @@
           return; // TTS is disabled, do nothing
         }
         
-        // Get voice gender preference
-        const voiceSettings = localStorage.getItem('voiceGenderSettings');
-        const useMaleVoice = voiceSettings ? JSON.parse(voiceSettings).useMaleVoice : false;
-        const voiceGender = useMaleVoice ? 'MALE' : 'FEMALE';
+        // Check which TTS provider to use
+        const ttsProviderSettings = localStorage.getItem('ttsProviderSettings');
+        const useElevenLabs = ttsProviderSettings ? JSON.parse(ttsProviderSettings).useElevenLabs : false;
         
         console.log('Generating speech for:', text);
-        console.log('Using voice gender:', voiceGender);
+        console.log('Using provider:', useElevenLabs ? 'ElevenLabs' : 'Google');
         
-        // Call the TTS API with voice gender
-        const result = await window.electronAPI.textToSpeech(text, voiceGender);
+        let response;
         
-        if (result.success) {
+        if (useElevenLabs) {
+          // Get selected voice
+          const voiceSettings = localStorage.getItem('elevenLabsVoiceSettings');
+          const voiceId = voiceSettings ? JSON.parse(voiceSettings).voiceId : null;
+          
+          console.log('Using ElevenLabs voice ID:', voiceId);
+          
+          // Call ElevenLabs TTS
+          response = await window.electronAPI.elevenLabsTTS(text, voiceId);
+        } else {
+          // Get voice gender preference for Google TTS
+          const voiceSettings = localStorage.getItem('voiceGenderSettings');
+          const useMaleVoice = voiceSettings ? JSON.parse(voiceSettings).useMaleVoice : false;
+          const voiceGender = useMaleVoice ? 'MALE' : 'FEMALE';
+          
+          console.log('Using Google voice gender:', voiceGender);
+          
+          // Call Google TTS
+          response = await window.electronAPI.textToSpeech(text, voiceGender);
+        }
+        
+        if (response && response.success) {
           // Create audio source from base64
-          const audioSrc = `data:audio/mp3;base64,${result.audioContent}`;
+          const audioSrc = `data:audio/mp3;base64,${response.audioContent}`;
           
           // Set the audio source and play
           ttsAudio.src = audioSrc;
           ttsAudio.play();
         } else {
-          console.error('TTS error:', result.error);
+          console.error('TTS error:', response ? response.error : 'No response');
         }
       } catch (error) {
         console.error('Error speaking text:', error);
@@ -833,6 +957,15 @@
       }
     }
 
+    // Add audio elements for mic sounds
+    const micMuteSound = document.createElement('audio');
+    micMuteSound.src = 'sounds/discordmute.mp3';
+    document.body.appendChild(micMuteSound);
+    
+    const micUnmuteSound = document.createElement('audio');
+    micUnmuteSound.src = 'sounds/unmute-sound.mp3';
+    document.body.appendChild(micUnmuteSound);
+    
     // Function to start voice input when the mic button is clicked
     function startVoiceInput() {
       // Store current classes to restore later if needed
@@ -844,19 +977,19 @@
       // Add mic-active class to status indicator
       statusIndicator.classList.add('mic-active');
       
-      // Check if user wants to use browser recognition directly
+      // Check if user wants to use ElevenLabs or browser recognition
       const savedSettings = localStorage.getItem('speechRecognitionSettings');
-      const useGoogleApi = savedSettings ? JSON.parse(savedSettings).useGoogleApi : false;
+      const useElevenLabsSTT = savedSettings ? JSON.parse(savedSettings).useElevenLabsSTT : true;
       
       // If user prefers browser recognition, use it directly
-      if (!useGoogleApi) {
+      if (!useElevenLabsSTT) {
         console.log("Using browser's built-in speech recognition (free)");
         useBrowserSpeechRecognition();
         return;
       }
       
-      // Otherwise, use Google's API (with recording)
-      console.log("Using Google's Speech-to-Text API (paid)");
+      // Otherwise, use ElevenLabs API (with recording)
+      console.log("Using ElevenLabs Speech-to-Text API");
       
       // Show recording indicator
       const sendIcon = sendButton.querySelector('i');
@@ -868,6 +1001,15 @@
       let mediaRecorder;
       let audioChunks = [];
       let isRecording = false;
+      
+      // Variables for silence detection
+      let silenceStart = null;
+      const silenceThreshold = 3; // Lower threshold for silence detection (more sensitive)
+      const silenceDelay = 2500; // Wait longer (2.5 seconds) before stopping on silence
+      
+      // Track recording start time for minimum duration
+      const recordingStartTime = Date.now();
+      const minimumRecordingTime = 3000; // Minimum 3 seconds of recording
       
       // Request microphone access
       navigator.mediaDevices.getUserMedia({ audio: true })
@@ -888,11 +1030,6 @@
           
           const bufferLength = analyser.fftSize;
           const dataArray = new Uint8Array(bufferLength);
-          
-          // Variables for silence detection
-          let silenceStart = null;
-          const silenceThreshold = 5; // Threshold for silence detection (lower value = more sensitive)
-          const silenceDelay = 1500; // Stop after 1.5 seconds of silence
           
           // Start recording
           mediaRecorder.start();
@@ -925,10 +1062,16 @@
               if (!silenceStart) {
                 silenceStart = Date.now();
               } else if (Date.now() - silenceStart > silenceDelay) {
-                console.log("Silence detected for " + silenceDelay + "ms, stopping recording");
-                clearInterval(silenceDetectionInterval);
-                if (isRecording) {
-                  stopRecording();
+                // Check if we've recorded for at least the minimum time
+                const recordingDuration = Date.now() - recordingStartTime;
+                if (recordingDuration >= minimumRecordingTime) {
+                  console.log("Silence detected for " + silenceDelay + "ms and minimum recording time reached, stopping recording");
+                  clearInterval(silenceDetectionInterval);
+                  if (isRecording) {
+                    stopRecording();
+                  }
+                } else {
+                  console.log("Silence detected but minimum recording time not reached yet");
                 }
               }
             } else {
@@ -961,8 +1104,8 @@
               
               try {
                 console.log("Sending audio to speech recognition...");
-                // Send to Google Speech API via main process
-                const result = await window.electronAPI.recognizeSpeech(base64Audio);
+                // Send to ElevenLabs Speech-to-Text API via main process
+                const result = await window.electronAPI.elevenLabsSTT(base64Audio);
                 
                 // Remove mic-active class from status indicator
                 statusIndicator.classList.remove('mic-active');
@@ -978,12 +1121,15 @@
                   sendIcon.style.color = '';
                   sendButton.title = 'Voice input';
                   
+                  // Filter out sound descriptions before sending
+                  const filteredText = filterSoundDescriptions(recognizedText);
+                  
                   // Directly send recognized text instead of showing in input
-                  if (recognizedText.trim() !== '') {
-                    // Add user message to chat
+                  if (filteredText.trim() !== '') {
+                    // Add user message to chat (will be hidden but stored) with original text
                     addMessage(recognizedText, true);
                     
-                    // Send to webhook
+                    // Send filtered text to webhook
                     const settings = JSON.parse(localStorage.getItem('n8nSettings') || '{}');
                     if (settings.url) {
                       // Show typing indicator
@@ -1000,7 +1146,7 @@
                       chatMessages.scrollTop = chatMessages.scrollHeight;
                       
                       // Send to n8n
-                      sendMessageToN8n(recognizedText).then(response => {
+                      sendMessageToN8n(filteredText).then(response => {
                         // Remove typing indicator
                         typingIndicator.remove();
                         
@@ -1078,8 +1224,8 @@
             stream.getTracks().forEach(track => track.stop());
           }
           
-          // Stop recording after 15 seconds or when button is clicked again
-          const maxRecordingTime = 15000; // 15 seconds
+          // Stop recording after 30 seconds or when button is clicked again
+          const maxRecordingTime = 30000; // 30 seconds
           const recordingTimeout = setTimeout(() => {
             if (isRecording) {
               stopRecording();
@@ -1101,6 +1247,8 @@
               mediaRecorder.stop();
               isRecording = false;
               console.log("Recording stopped manually");
+              // Play mute sound
+              micMuteSound.play();
             }
           }
         })
@@ -1150,12 +1298,15 @@
           // Restore appropriate status
           restoreStatusIndicator();
           
+          // Filter out sound descriptions before sending
+          const filteredText = filterSoundDescriptions(transcript);
+          
           // Directly send recognized text instead of showing in input
-          if (transcript.trim() !== '') {
-            // Add user message to chat
+          if (filteredText.trim() !== '') {
+            // Add user message to chat (will be hidden but stored) with original text
             addMessage(transcript, true);
             
-            // Send to webhook
+            // Send filtered text to webhook
             const settings = JSON.parse(localStorage.getItem('n8nSettings') || '{}');
             if (settings.url) {
               // Show typing indicator
@@ -1172,7 +1323,7 @@
               chatMessages.scrollTop = chatMessages.scrollHeight;
               
               // Send to n8n
-              sendMessageToN8n(transcript).then(response => {
+              sendMessageToN8n(filteredText).then(response => {
                 // Remove typing indicator
                 typingIndicator.remove();
                 
@@ -1338,8 +1489,8 @@
 
     // Add event listener for minimized mic button
     minimizedMicBtn.addEventListener('click', () => {
-      // Chat remains minimized, just start voice input directly
-      startVoiceInputMinimized();
+      // Call the same function as the regular mic button
+      handleSendButtonClick();
     });
 
     // Function to handle voice input in minimized state
@@ -1386,16 +1537,19 @@
           // Restore appropriate status
           restoreStatusIndicator();
           
-          // Directly send the recognized text
-          if (transcript.trim() !== '') {
-            // Add user message to chat (will be hidden but stored)
+          // Filter out sound descriptions before sending
+          const filteredText = filterSoundDescriptions(transcript);
+          
+          // Directly send recognized text instead of showing in input
+          if (filteredText.trim() !== '') {
+            // Add user message to chat (will be hidden but stored) with original text
             addMessage(transcript, true);
             
-            // Send to webhook
+            // Send filtered text to webhook
             const settings = JSON.parse(localStorage.getItem('n8nSettings') || '{}');
             if (settings.url) {
               // Send to n8n
-              sendMessageToN8n(transcript).then(response => {
+              sendMessageToN8n(filteredText).then(response => {
                 // Process the response
                 if (response) {
                   // If response is an array, use the first item
@@ -1490,8 +1644,12 @@
           
           // Variables for silence detection
           let silenceStart = null;
-          const silenceThreshold = 5; // Threshold for silence detection (lower value = more sensitive)
-          const silenceDelay = 1500; // Stop after 1.5 seconds of silence
+          const silenceThreshold = 3; // Lower threshold for silence detection (more sensitive)
+          const silenceDelay = 2500; // Wait longer (2.5 seconds) before stopping on silence
+          
+          // Track recording start time for minimum duration
+          const recordingStartTime = Date.now();
+          const minimumRecordingTime = 3000; // Minimum 3 seconds of recording
           
           // Start recording
           mediaRecorder.start();
@@ -1524,10 +1682,16 @@
               if (!silenceStart) {
                 silenceStart = Date.now();
               } else if (Date.now() - silenceStart > silenceDelay) {
-                console.log("Silence detected for " + silenceDelay + "ms, stopping recording");
-                clearInterval(silenceDetectionInterval);
-                if (isRecording) {
-                  stopRecording();
+                // Check if we've recorded for at least the minimum time
+                const recordingDuration = Date.now() - recordingStartTime;
+                if (recordingDuration >= minimumRecordingTime) {
+                  console.log("Silence detected for " + silenceDelay + "ms and minimum recording time reached, stopping recording");
+                  clearInterval(silenceDetectionInterval);
+                  if (isRecording) {
+                    stopRecording();
+                  }
+                } else {
+                  console.log("Silence detected but minimum recording time not reached yet");
                 }
               }
             } else {
@@ -1567,16 +1731,19 @@
                   const recognizedText = result.text;
                   console.log("Speech recognized:", recognizedText);
                   
+                  // Filter out sound descriptions before sending
+                  const filteredText = filterSoundDescriptions(recognizedText);
+                  
                   // Directly send recognized text instead of showing in input
-                  if (recognizedText.trim() !== '') {
-                    // Add user message to chat
+                  if (filteredText.trim() !== '') {
+                    // Add user message to chat (will be hidden but stored) with original text
                     addMessage(recognizedText, true);
                     
-                    // Send to webhook
+                    // Send filtered text to webhook
                     const settings = JSON.parse(localStorage.getItem('n8nSettings') || '{}');
                     if (settings.url) {
                       // Send to n8n
-                      sendMessageToN8n(recognizedText).then(response => {
+                      sendMessageToN8n(filteredText).then(response => {
                         // Process the response
                         if (response) {
                           // If response is an array, use the first item
@@ -1651,8 +1818,8 @@
             stream.getTracks().forEach(track => track.stop());
           }
           
-          // Stop recording after 15 seconds or when minimized mic button is clicked again
-          const maxRecordingTime = 15000; // 15 seconds
+          // Stop recording after 30 seconds or when button is clicked again
+          const maxRecordingTime = 30000; // 30 seconds
           const recordingTimeout = setTimeout(() => {
             if (isRecording) {
               stopRecording();
@@ -1674,6 +1841,8 @@
               mediaRecorder.stop();
               isRecording = false;
               console.log("Recording stopped manually");
+              // Play mute sound
+              micMuteSound.play();
             }
           }
         })
@@ -1761,6 +1930,12 @@
         console.error('Error checking dependency status:', error);
       }
     });
+
+    // Function to filter out sound descriptions in parentheses
+    function filterSoundDescriptions(text) {
+      // Remove patterns like "(techno music)", "(heartbeats)", etc.
+      return text.replace(/\([^)]+\)/g, '').trim();
+    }
   </script>
 </body>
 </html>
