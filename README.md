@@ -56,8 +56,9 @@ A floating, always-on-top desktop chat app powered by Google Gemini AI and n8n a
 - Visual mic controls and auto-timeout
 
 ### ⚙️ Configuration
-- In-app settings (gear icon)
-- Set n8n webhook URL or use Gemini fallback
+- Launch the app and click the gear icon (⚙️) to open settings.
+- Enter your n8n Webhook URL (optional, for custom workflows).
+- The app will use Gemini AI if n8n is unavailable.
 
 ### 🛠️ Build & Distribution
 - Cross-platform: Windows, macOS, Linux
@@ -71,6 +72,34 @@ A floating, always-on-top desktop chat app powered by Google Gemini AI and n8n a
 - No telemetry or tracking
 - Local voice fallback
 - Visual network indicators
+
+### 🔑 API Keys
+
+### Getting API Keys
+To use all features of Deep AI Chat, you'll need to obtain the following API keys:
+
+#### Google Gemini API
+1. Visit the [Google AI Studio](https://aistudio.google.com/) and sign in with your Google account
+2. Navigate to the API keys section (usually found in settings or dashboard)
+3. Create a new API key and copy it
+4. For more details, visit the [Google AI documentation](https://ai.google.dev/tutorials/setup)
+
+#### ElevenLabs API (for enhanced Text-to-Speech)
+1. Create an account at [ElevenLabs](https://elevenlabs.io/)
+2. Navigate to your profile settings
+3. Find your API key in the "API" section
+4. Copy your API key
+5. Free tier includes limited usage; paid plans offer more voice options and usage
+
+### Updating API Keys in the App
+1. Launch Deep AI Chat
+2. Click the gear icon (⚙️) in the top-right corner to open settings
+3. Paste your Google Gemini API key in the "Gemini API Key" field
+4. Paste your ElevenLabs API key in the "ElevenLabs API Key" field
+5. Click "Save Settings"
+6. The app will immediately begin using your API keys for enhanced functionality
+
+**Note:** If you don't provide API keys, some features may be limited or unavailable. The app will attempt to use default services where possible.
 
 ---
 
@@ -115,20 +144,15 @@ Creates an installer and a portable executable in the `dist/` folder.
 
 ---
 
-## ⚙️ Configuration
-- Launch the app and click the gear icon (⚙️) to open settings.
-- Enter your n8n Webhook URL (optional, for custom workflows).
-- The app will use Gemini AI if n8n is unavailable.
-
----
-
 ## 🩺 Troubleshooting
 | Problem                  | Solution                                               |
 |--------------------------|--------------------------------------------------------|
 | n8n not connecting       | Check if webhook URL is correct in settings            |
-| App won’t start          | Re-run `node install-electron.js` and `install-dependencies.js` |
+| App won't start          | Re-run `node install-electron.js` and `install-dependencies.js` |
 | Voice not working        | Ensure microphone permissions are enabled              |
 | Build fails              | Delete `dist/` and try `npm run build` again          |
+| API features not working | Check that you've entered valid API keys in settings   |
+| Rate limit errors        | You may have exceeded your API quota; consider upgrading your plan |
 
 ---
 
@@ -137,6 +161,7 @@ Creates an installer and a portable executable in the `dist/` folder.
 - n8n (workflow automation)
 - Google Gemini (Generative AI)
 - Google Cloud Speech API (voice recognition)
+- ElevenLabs (Text-to-Speech)
 - SQLite3 (local storage)
 
 ---
@@ -146,5 +171,7 @@ Built with ❤️ using [n8n](https://n8n.io/) and Google AI.
 
 - [n8n GitHub](https://github.com/n8n-io/n8n)
 - [n8n Official Website](https://n8n.io/)
+- [Google AI](https://ai.google.dev/)
+- [ElevenLabs](https://elevenlabs.io/)
 
 We thank the n8n team and community for their outstanding work in workflow automation!

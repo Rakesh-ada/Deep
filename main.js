@@ -1,16 +1,69 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, Tray } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const https = require('https');
 const fetch = require('node-fetch');
+const { spawn } = require('child_process');
+const axios = require('axios');
+const FormData = require('form-data');
 const speech = require('@google-cloud/speech');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Google API key
-const GOOGLE_API_KEY = ;
+// Create a local settings storage as a fallback
+let settingsStorage = { 
+  data: {},
+  get: (key) => settingsStorage.data[key] || '',
+  set: (key, value) => { settingsStorage.data[key] = value; }
+};
 
-// Initialize the Gemini API
+// Default API keys
+let GOOGLE_API_KEY = '';
+let ELEVENLABS_API_KEY = '';
+
+// Initialize the Gemini API (will be updated when key is loaded)
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
+
+// ElevenLabs client (will be initialized later)
+let elevenLabsClient = null;
+
+// Import and initialize electron-store and ElevenLabs asynchronously
+(async () => {
+  try {
+    // Import electron-store
+    const { default: Store } = await import('electron-store');
+    const store = new Store();
+    
+    // Replace the temporary storage with the real one
+    settingsStorage = store;
+    
+    // Get API keys from settings
+    GOOGLE_API_KEY = store.get('googleApiKey') || '';
+    ELEVENLABS_API_KEY = store.get('elevenLabsApiKey') || ELEVENLABS_API_KEY;
+    
+    // Store the ElevenLabs API key if not already saved
+    if (!store.get('elevenLabsApiKey')) {
+      store.set('elevenLabsApiKey', ELEVENLABS_API_KEY);
+    }
+    
+    // Update Gemini API with the loaded key
+    Object.assign(genAI, new GoogleGenerativeAI(GOOGLE_API_KEY));
+    
+    // Import and initialize ElevenLabs
+    try {
+      const { ElevenLabs } = await import('@elevenlabs/elevenlabs-js');
+      elevenLabsClient = new ElevenLabs({
+        apiKey: ELEVENLABS_API_KEY
+      });
+      console.log('ElevenLabs client initialized successfully');
+    } catch (elevenLabsError) {
+      console.error('Failed to initialize ElevenLabs client:', elevenLabsError);
+    }
+    
+    console.log('Settings store initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize settings store:', error);
+  }
+})();
 
 // Create a custom user data directory in the app's directory
 const userDataPath = path.join(app.getPath('userData'), 'ChatAppData');
@@ -32,7 +85,8 @@ function checkDependencies() {
     { name: 'node-fetch', module: 'node-fetch' },
     { name: '@google-cloud/speech', module: '@google-cloud/speech' },
     { name: '@google/generative-ai', module: '@google/generative-ai' },
-    { name: 'sqlite3', module: 'sqlite3' }
+    { name: 'sqlite3', module: 'sqlite3' },
+    // electron-store is dynamically imported
   ];
   
   const missingDependencies = [];
@@ -741,8 +795,18 @@ ipcMain.handle('recognize-speech', async (event, audioBuffer) => {
       };
     }
     
-    // API key provided by the user
-    const apiKey = 'AIzaSyDG6ln6ljylsBOFmTmIgG9_Y2IkpInRZ84';
+    // Get API key from settings
+    const apiKey = settingsStorage.get('googleApiKey') || '';
+    
+    // Verify API key is available
+    if (!apiKey) {
+      console.error('Google API key is not set in settings');
+      return {
+        success: false,
+        error: 'API key not configured. Please set your Google API key in settings.',
+        useBrowser: true
+      };
+    }
     
     // Log audio buffer information for debugging
     console.log('Audio buffer length:', audioBuffer.length);
@@ -822,8 +886,17 @@ ipcMain.handle('text-to-speech', async (event, text, voiceGender = 'FEMALE') => 
     console.log('Generating speech for text:', text);
     console.log('Using voice gender:', voiceGender);
     
-    // API key provided by the user
-    const apiKey = 'AIzaSyDG6ln6ljylsBOFmTmIgG9_Y2IkpInRZ84';
+    // Get API key from settings
+    const apiKey = settingsStorage.get('googleApiKey') || '';
+    
+    // Verify API key is available
+    if (!apiKey) {
+      console.error('Google API key is not set in settings');
+      return {
+        success: false,
+        error: 'API key not configured. Please set your Google API key in settings.'
+      };
+    }
     
     // Select voice based on gender
     const voiceName = voiceGender === 'MALE' ? 'en-US-Neural2-D' : 'en-US-Neural2-F';
@@ -1009,4 +1082,282 @@ ipcMain.handle('get-dependency-status', async () => {
     missingDependencies: missingDependencies,
     n8n: n8nStatus
   };
+});
+
+// Add API key related IPC handlers
+ipcMain.handle('get-api-key', (event, service) => {
+  switch(service) {
+    case 'google':
+      return settingsStorage.get('googleApiKey') || '';
+    case 'elevenlabs':
+      return settingsStorage.get('elevenLabsApiKey') || '';
+    default:
+      return '';
+  }
+});
+
+ipcMain.handle('set-api-key', (event, service, apiKey) => {
+  switch(service) {
+    case 'google':
+      settingsStorage.set('googleApiKey', apiKey);
+      // Update the global API key
+      GOOGLE_API_KEY = apiKey;
+      // Reinitialize the Gemini API with the new key
+      Object.assign(genAI, new GoogleGenerativeAI(apiKey));
+      break;
+    case 'elevenlabs':
+      settingsStorage.set('elevenLabsApiKey', apiKey);
+      // Update the global API key
+      ELEVENLABS_API_KEY = apiKey;
+      // Reinitialize ElevenLabs client
+      (async () => {
+        try {
+          const { ElevenLabs } = await import('@elevenlabs/elevenlabs-js');
+          elevenLabsClient = new ElevenLabs({
+            apiKey: apiKey
+          });
+        } catch (error) {
+          console.error('Failed to reinitialize ElevenLabs client:', error);
+        }
+      })();
+      break;
+  }
+  return { success: true };
+});
+
+// Additional IPC handlers for ElevenLabs text-to-speech
+ipcMain.handle('elevenlabs-tts', async (event, text, voiceId) => {
+  try {
+    console.log('Generating speech with ElevenLabs for text:', text);
+    console.log('Using voice ID:', voiceId);
+    
+    // Get API key from settings
+    const apiKey = settingsStorage.get('elevenLabsApiKey') || ELEVENLABS_API_KEY;
+    
+    // Verify API key is available
+    if (!apiKey) {
+      console.error('ElevenLabs API key is not set');
+      return {
+        success: false,
+        error: 'ElevenLabs API key not configured. Please set your ElevenLabs API key in settings.'
+      };
+    }
+    
+    // Use default voice if none provided
+    const finalVoiceId = voiceId || 'JBFqnCBsd6RMkjVDRZzb'; // Default voice
+    
+    // Prepare the request data for Text-to-Speech
+    const requestData = {
+      text: text,
+      model_id: "eleven_multilingual_v2",
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.75
+      }
+    };
+    
+    // Make a direct HTTP request to the ElevenLabs Text-to-Speech API
+    try {
+      console.log('Sending request to ElevenLabs Text-to-Speech API...');
+      
+      const response = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${finalVoiceId}?output_format=mp3_44100_128`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'xi-api-key': apiKey
+          },
+          body: JSON.stringify(requestData)
+        }
+      );
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('ElevenLabs API response status:', response.status);
+        console.error('ElevenLabs API error:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+      }
+      
+      // Get audio data as buffer
+      const audioBuffer = await response.arrayBuffer();
+      
+      // Convert buffer to base64
+      const audioBase64 = Buffer.from(audioBuffer).toString('base64');
+      
+      console.log('ElevenLabs speech generated successfully');
+      return { success: true, audioContent: audioBase64 };
+    } catch (error) {
+      console.error('Error calling ElevenLabs Text-to-Speech API:', error);
+      return { success: false, error: error.message };
+    }
+  } catch (error) {
+    console.error('ElevenLabs text-to-speech error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Handler to get available ElevenLabs voices
+ipcMain.handle('elevenlabs-get-voices', async (event) => {
+  try {
+    console.log('Getting available ElevenLabs voices');
+    
+    // Get API key from settings
+    const apiKey = settingsStorage.get('elevenLabsApiKey') || ELEVENLABS_API_KEY;
+    
+    // Verify API key is available
+    if (!apiKey) {
+      console.error('ElevenLabs API key is not set');
+      return {
+        success: false,
+        error: 'ElevenLabs API key not configured. Please set your ElevenLabs API key in settings.'
+      };
+    }
+    
+    // Make a direct HTTP request to the ElevenLabs Voices API
+    try {
+      console.log('Sending request to ElevenLabs Voices API...');
+      
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/voices',
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'xi-api-key': apiKey
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('ElevenLabs API response status:', response.status);
+        console.error('ElevenLabs API error:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+      }
+      
+      // Parse the response to get the voices
+      const data = await response.json();
+      console.log('ElevenLabs voices retrieved successfully');
+      return { success: true, voices: data.voices };
+    } catch (error) {
+      console.error('Error calling ElevenLabs Voices API:', error);
+      return { success: false, error: error.message };
+    }
+  } catch (error) {
+    console.error('ElevenLabs get voices error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Handler for ElevenLabs speech recognition
+ipcMain.handle('elevenlabs-stt', async (event, audioBuffer) => {
+  try {
+    console.log('Received audio for ElevenLabs speech recognition');
+    
+    // Validate the audio buffer
+    if (!audioBuffer) {
+      console.error('Audio buffer is undefined or empty');
+      return { 
+        success: false, 
+        error: 'No audio data received', 
+        useBrowser: true
+      };
+    }
+    
+    // Additional validation to ensure buffer has content
+    if (typeof audioBuffer !== 'string' || audioBuffer.length < 100) {
+      console.error('Audio buffer is invalid or too small:', 
+        typeof audioBuffer === 'string' ? `Length: ${audioBuffer.length}` : typeof audioBuffer);
+      return { 
+        success: false, 
+        error: 'Invalid audio data received', 
+        useBrowser: true
+      };
+    }
+    
+    // Get API key from settings
+    const apiKey = settingsStorage.get('elevenLabsApiKey') || ELEVENLABS_API_KEY;
+    
+    // Verify API key is available
+    if (!apiKey) {
+      console.error('ElevenLabs API key is not set');
+      return {
+        success: false,
+        error: 'API key not configured. Please set your ElevenLabs API key in settings.',
+        useBrowser: true
+      };
+    }
+    
+    // Log audio buffer information for debugging
+    console.log('Audio buffer length:', audioBuffer.length);
+    
+    // Convert base64 to binary
+    const binaryData = Buffer.from(audioBuffer, 'base64');
+    
+    // Create a temporary file to store the audio
+    const tempFilePath = path.join(app.getPath('temp'), `speech_${Date.now()}.webm`);
+    fs.writeFileSync(tempFilePath, binaryData);
+    
+    try {
+      console.log('Sending request to ElevenLabs Speech-to-Text API...');
+      
+      // Use axios for better multipart form handling
+      const axios = require('axios');
+      const FormData = require('form-data');
+      
+      const form = new FormData();
+      form.append('model_id', 'scribe_v1');
+      form.append('file', fs.createReadStream(tempFilePath));
+      form.append('language_code', 'en');
+      
+      const response = await axios.post('https://api.elevenlabs.io/v1/speech-to-text', form, {
+        headers: {
+          'xi-api-key': apiKey,
+          ...form.getHeaders()
+        }
+      });
+      
+      // Clean up temporary file
+      try {
+        fs.unlinkSync(tempFilePath);
+      } catch (cleanupError) {
+        console.error('Error cleaning up temporary file:', cleanupError);
+      }
+      
+      // Extract the response data
+      const data = response.data;
+      console.log('ElevenLabs Speech API response:', data);
+      
+      // Extract the transcription
+      if (data.text) {
+        console.log('Speech recognition result:', data.text);
+        return { success: true, text: data.text };
+      } else {
+        console.log('No speech recognized');
+        return { success: false, error: 'No speech recognized', useBrowser: true };
+      }
+    } catch (error) {
+      console.error('Error calling ElevenLabs Speech-to-Text API:', error);
+      
+      // Try to get more detailed error information
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
+      
+      return { success: false, error: error.message, useBrowser: true };
+    }
+  } catch (error) {
+    console.error('ElevenLabs speech recognition error:', error);
+    
+    // Instruct the renderer to use browser's speech recognition as fallback
+    return { 
+      success: false, 
+      error: error.message,
+      useBrowser: true 
+    };
+  }
 }); 
