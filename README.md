@@ -6,6 +6,9 @@
 
 A floating, always-on-top desktop chat app powered by Google Gemini AI and n8n automation. Stay productive with a modern AI assistant that understands text and voice, handles automation, and looks good while doing it.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/UDvBAb-0Dgk?si=EKkXjG5e9UQ_gdMa" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
 ---
 
 ## 🚀 Quick Start
@@ -175,3 +178,5 @@ Built with ❤️ using [n8n](https://n8n.io/) and Google AI.
 - [ElevenLabs](https://elevenlabs.io/)
 
 We thank the n8n team and community for their outstanding work in workflow automation!
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/NNUuvdshQyI?si=iA_6IMnELdwhpJQ0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
