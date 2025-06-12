@@ -31,7 +31,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // ElevenLabs API functions
   elevenLabsTTS: (text, voiceId) => ipcRenderer.invoke('elevenlabs-tts', text, voiceId),
   elevenLabsSTT: (audioBuffer) => ipcRenderer.invoke('elevenlabs-stt', audioBuffer),
-  elevenLabsGetVoices: () => ipcRenderer.invoke('elevenlabs-get-voices')
+  elevenLabsGetVoices: () => ipcRenderer.invoke('elevenlabs-get-voices'),
+  
+  // Speech language settings
+  getSpeechRecognitionLanguage: () => ipcRenderer.invoke('get-speech-recognition-language'),
+  setSpeechRecognitionLanguage: (language) => ipcRenderer.invoke('set-speech-recognition-language', language),
+  getSupportedSpeechLanguages: () => ipcRenderer.invoke('get-supported-speech-languages'),
+  
+  // Settings panel
+  openSettingsPanel: () => ipcRenderer.invoke('open-settings-panel'),
+  saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings)
 });
 
 // Listen for n8n started event

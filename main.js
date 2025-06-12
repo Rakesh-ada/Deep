@@ -20,6 +20,15 @@ let settingsStorage = {
 let GOOGLE_API_KEY = '';
 let ELEVENLABS_API_KEY = '';
 
+// Default supported languages for speech recognition
+const SUPPORTED_SPEECH_LANGUAGES = [
+  { code: 'auto', name: 'Auto Detect' },
+  { code: 'en', name: 'English (US)' },
+  { code: 'en-IN', name: 'English (India)' },
+  { code: 'bn', name: 'Bengali' },
+  { code: 'hi', name: 'Hindi' }
+];
+
 // Initialize the Gemini API (will be updated when key is loaded)
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 
@@ -811,13 +820,40 @@ ipcMain.handle('recognize-speech', async (event, audioBuffer) => {
     // Log audio buffer information for debugging
     console.log('Audio buffer length:', audioBuffer.length);
     
+    // Get user's preferred language from settings
+    const preferredLanguage = settingsStorage.get('speechRecognitionLanguage') || 'auto';
+    
+    // Determine language code based on user preference
+    let languageCode = 'en-US';  // Default fallback
+    let alternativeLanguageCodes = ['en-IN', 'bn-IN', 'hi-IN'];  // Only English, Bengali, and Hindi
+    
+    // Set specific language code if user selected a specific language
+    if (preferredLanguage === 'en-IN') {
+      languageCode = 'en-IN';  // English (India)
+      alternativeLanguageCodes = ['en-US'];  // Only other English variant
+    } else if (preferredLanguage === 'bn') {
+      languageCode = 'bn-IN';  // Bengali
+      alternativeLanguageCodes = [];  // No alternatives, force Bengali only
+    } else if (preferredLanguage === 'hi') {
+      languageCode = 'hi-IN';  // Hindi
+      alternativeLanguageCodes = [];  // No alternatives, force Hindi only
+    } else if (preferredLanguage === 'auto') {
+      // In auto mode, provide all three languages but only these three
+      languageCode = 'en-US';  // Try English first
+      alternativeLanguageCodes = ['en-IN', 'bn-IN', 'hi-IN'];
+    }
+    
+    console.log(`Using speech recognition language: ${languageCode} with alternatives: ${alternativeLanguageCodes.join(', ')}`);
+    
     // Prepare the request data - ensure audio content is properly formatted
     const requestData = {
       config: {
         encoding: 'WEBM_OPUS',  // Changed to match what MediaRecorder produces
         sampleRateHertz: 48000,
-        languageCode: 'en-US',
-        model: 'command_and_search'  // Better for short commands
+        languageCode: languageCode,
+        alternativeLanguageCodes: alternativeLanguageCodes,
+        model: 'command_and_search',  // Better for short commands
+        enableAutomaticPunctuation: true
       },
       audio: {
         content: audioBuffer  // This is already base64 encoded from the client
@@ -852,14 +888,41 @@ ipcMain.handle('recognize-speech', async (event, audioBuffer) => {
       const data = JSON.parse(responseText);
       console.log('Speech API response:', data);
       
+      // Log detailed language detection results for debugging
+      logLanguageDetectionResults(data);
+      
       // Extract the transcription
       if (data.results && data.results.length > 0) {
+        // Get the detected language code
+        const detectedLanguage = data.results[0]?.languageCode || 'unknown';
+        console.log('Detected language:', detectedLanguage);
+        
+        // Check if the detected language is one of our supported languages
+        const isValidLanguage = detectedLanguage.startsWith('en') || 
+                               detectedLanguage.startsWith('bn') || 
+                               detectedLanguage.startsWith('hi');
+        
+        if (!isValidLanguage) {
+          console.log('Detected language not in our supported list (en/bn/hi)');
+          return { 
+            success: false, 
+            error: 'Speech not recognized in supported languages (English, Bengali, Hindi)',
+            detectedLanguage: detectedLanguage
+          };
+        }
+        
+        // Extract transcription from valid language
         const transcription = data.results
           .map(result => result.alternatives[0].transcript)
           .join('\n');
         
         console.log('Speech recognition result:', transcription);
-        return { success: true, text: transcription };
+        
+        return { 
+          success: true, 
+          text: transcription,
+          detectedLanguage: detectedLanguage
+        };
       } else {
         console.log('No speech recognized');
         return { success: false, error: 'No speech recognized', useBrowser: true };
@@ -1309,7 +1372,34 @@ ipcMain.handle('elevenlabs-stt', async (event, audioBuffer) => {
       const form = new FormData();
       form.append('model_id', 'scribe_v1');
       form.append('file', fs.createReadStream(tempFilePath));
-      form.append('language_code', 'en');
+      
+      // Get preferred language, but handle it properly for ElevenLabs API
+      const preferredLanguage = settingsStorage.get('speechRecognitionLanguage') || 'auto';
+      
+      // Map our language codes to ElevenLabs accepted codes - only support English, Bengali, Hindi
+      let elevenLabsLangCode = null; // null means auto-detect but we'll restrict it
+      
+      // Force one of our three supported languages
+      if (preferredLanguage === 'en' || preferredLanguage === 'en-US') {
+        elevenLabsLangCode = 'eng'; // English (US)
+      } else if (preferredLanguage === 'en-IN') {
+        elevenLabsLangCode = 'eng'; // English (India) - still uses 'eng' code
+      } else if (preferredLanguage === 'bn') {
+        elevenLabsLangCode = 'ben'; // Bengali
+      } else if (preferredLanguage === 'hi') {
+        elevenLabsLangCode = 'hin'; // Hindi
+      } else {
+        // If auto or any other value, default to English
+        elevenLabsLangCode = 'eng';
+      }
+      
+      // Only add language_code if we have a specific language to use
+      if (elevenLabsLangCode) {
+        form.append('language_code', elevenLabsLangCode);
+        console.log(`Using ElevenLabs language code: ${elevenLabsLangCode}`);
+      } else {
+        console.log('Using ElevenLabs automatic language detection');
+      }
       
       const response = await axios.post('https://api.elevenlabs.io/v1/speech-to-text', form, {
         headers: {
@@ -1359,5 +1449,155 @@ ipcMain.handle('elevenlabs-stt', async (event, audioBuffer) => {
       error: error.message,
       useBrowser: true 
     };
+  }
+});
+
+// Add a new IPC handler for language selection for speech recognition
+ipcMain.handle('set-speech-recognition-language', (event, language) => {
+  try {
+    console.log(`Setting speech recognition language to: ${language}`);
+    
+    // Store the selected language in settings
+    settingsStorage.set('speechRecognitionLanguage', language);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error setting speech recognition language:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Add an IPC handler to get the current speech recognition language
+ipcMain.handle('get-speech-recognition-language', () => {
+  try {
+    // Get the stored language or default to 'auto'
+    const language = settingsStorage.get('speechRecognitionLanguage') || 'auto';
+    
+    return { 
+      success: true, 
+      language: language,
+      supportedLanguages: SUPPORTED_SPEECH_LANGUAGES 
+    };
+  } catch (error) {
+    console.error('Error getting speech recognition language:', error);
+    return { 
+      success: false, 
+      error: error.message, 
+      language: 'auto',
+      supportedLanguages: SUPPORTED_SPEECH_LANGUAGES
+    };
+  }
+});
+
+// Add an IPC handler to get the list of supported speech recognition languages
+ipcMain.handle('get-supported-speech-languages', () => {
+  try {
+    return { success: true, languages: SUPPORTED_SPEECH_LANGUAGES };
+  } catch (error) {
+    console.error('Error getting supported speech languages:', error);
+    return { success: false, error: error.message, languages: [] };
+  }
+});
+
+// Helper function to log detailed language detection results
+function logLanguageDetectionResults(data) {
+  try {
+    if (!data || !data.results) {
+      console.log('No speech recognition results to analyze');
+      return;
+    }
+    
+    console.log(`Speech recognition found ${data.results.length} result(s)`);
+    
+    // Log each result with its language code and confidence
+    data.results.forEach((result, index) => {
+      console.log(`Result #${index + 1}:`);
+      
+      // Language info if available
+      if (result.languageCode) {
+        console.log(`  Language detected: ${result.languageCode}`);
+      }
+      
+      // Alternatives with confidence scores
+      if (result.alternatives && result.alternatives.length > 0) {
+        result.alternatives.forEach((alt, altIndex) => {
+          console.log(`  Alternative #${altIndex + 1}: "${alt.transcript}" (confidence: ${alt.confidence || 'N/A'})`);
+        });
+      }
+    });
+  } catch (error) {
+    console.error('Error logging language detection results:', error);
+  }
+}
+
+// Add an IPC handler for accessing settings panel
+ipcMain.handle('open-settings-panel', (event) => {
+  try {
+    console.log('Opening settings panel');
+    
+    // Get current settings
+    const googleApiKey = settingsStorage.get('googleApiKey') || '';
+    const elevenLabsApiKey = settingsStorage.get('elevenLabsApiKey') || '';
+    const speechLanguage = settingsStorage.get('speechRecognitionLanguage') || 'auto';
+    
+    return { 
+      success: true, 
+      settings: {
+        googleApiKey,
+        elevenLabsApiKey,
+        speechLanguage
+      },
+      supportedLanguages: SUPPORTED_SPEECH_LANGUAGES
+    };
+  } catch (error) {
+    console.error('Error opening settings panel:', error);
+    return { 
+      success: false, 
+      error: error.message,
+      supportedLanguages: SUPPORTED_SPEECH_LANGUAGES
+    };
+  }
+});
+
+// Add an IPC handler for saving all settings at once
+ipcMain.handle('save-settings', (event, settings) => {
+  try {
+    console.log('Saving settings:', settings);
+    
+    // Validate settings
+    if (settings.googleApiKey !== undefined) {
+      settingsStorage.set('googleApiKey', settings.googleApiKey);
+      // Update the global API key
+      GOOGLE_API_KEY = settings.googleApiKey;
+      // Reinitialize the Gemini API with the new key
+      Object.assign(genAI, new GoogleGenerativeAI(settings.googleApiKey));
+    }
+    
+    if (settings.elevenLabsApiKey !== undefined) {
+      settingsStorage.set('elevenLabsApiKey', settings.elevenLabsApiKey);
+      // Update the global API key
+      ELEVENLABS_API_KEY = settings.elevenLabsApiKey;
+      // Reinitialize ElevenLabs client
+      (async () => {
+        try {
+          const { ElevenLabs } = await import('@elevenlabs/elevenlabs-js');
+          elevenLabsClient = new ElevenLabs({
+            apiKey: settings.elevenLabsApiKey
+          });
+        } catch (error) {
+          console.error('Failed to reinitialize ElevenLabs client:', error);
+        }
+      })();
+    }
+    
+    if (settings.speechLanguage !== undefined) {
+      settingsStorage.set('speechRecognitionLanguage', settings.speechLanguage);
+      console.log(`Speech recognition language set to: ${settings.speechLanguage}`);
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    return { success: false, error: error.message };
   }
 }); 

@@ -6,7 +6,7 @@
   <title>Deep AI Chat</title>
   <link rel="icon" href="assets/deep.ico" type="image/x-icon">
   <link rel="shortcut icon" href="assets/deep.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/icons/css/all.min.css" />
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -99,6 +99,15 @@
           <small>Your ElevenLabs API key for advanced Speech-to-Text and Text-to-Speech.</small>
         </div>
         
+        <!-- Add language selection dropdown -->
+        <div class="form-group">
+          <label for="speech-language">Speech Recognition Language</label>
+          <select id="speech-language" class="form-select">
+            <option value="loading">Loading languages...</option>
+          </select>
+          <small>Select the primary language for speech recognition.</small>
+        </div>
+        
         <div class="form-buttons">
           <button type="button" id="test-webhook" class="btn test-btn">Test Connection</button>
           <button type="submit" class="btn">Save Settings</button>
@@ -108,7 +117,7 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="assets/gsap/gsap.min.js"></script>
   <script>
     // Store references to common elements
       const chatContainer = document.querySelector('.chat-container');
@@ -362,6 +371,7 @@
       loadSpeechRecognitionSettings();
       loadTextToSpeechSettings();
       loadApiKeys();
+      loadSpeechLanguages();
       
       // Load ElevenLabs voices
       await loadElevenLabsVoices();
@@ -417,6 +427,44 @@
         }
       } catch (error) {
         console.error('Error loading API keys:', error);
+      }
+    };
+    
+    // Load speech recognition languages
+    const loadSpeechLanguages = async () => {
+      try {
+        // Show loading state
+        const speechLanguageSelect = document.getElementById('speech-language');
+        speechLanguageSelect.innerHTML = '<option value="loading">Loading languages...</option>';
+        
+        // Get languages from main process
+        const result = await window.electronAPI.getSpeechRecognitionLanguage();
+        
+        if (result.success && result.supportedLanguages) {
+          // Clear the select
+          speechLanguageSelect.innerHTML = '';
+          
+          // Add each language as an option
+          result.supportedLanguages.forEach(lang => {
+            const option = document.createElement('option');
+            option.value = lang.code;
+            option.textContent = lang.name;
+            speechLanguageSelect.appendChild(option);
+          });
+          
+          // Select the current language
+          if (result.language) {
+            speechLanguageSelect.value = result.language;
+          }
+        } else {
+          // Show error
+          speechLanguageSelect.innerHTML = '<option value="auto">Auto Detect (Default)</option>';
+          console.error('Failed to load speech languages:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading speech languages:', error);
+        const speechLanguageSelect = document.getElementById('speech-language');
+        speechLanguageSelect.innerHTML = '<option value="auto">Auto Detect (Default)</option>';
       }
     };
     
@@ -582,7 +630,20 @@
       }
     });
     
-        // Function to speak text using the selected TTS provider
+    // Event listener for speech language change
+    const speechLanguageSelect = document.getElementById('speech-language');
+    speechLanguageSelect.addEventListener('change', () => {
+      const selectedLanguage = speechLanguageSelect.value;
+      localStorage.setItem('speechRecognitionSettings', JSON.stringify({
+        useElevenLabsSTT: selectedLanguage !== 'auto',
+        useGoogleApi: selectedLanguage === 'auto',
+        language: selectedLanguage
+      }));
+      updateSttProviderLabel();
+      addMessage(`Speech recognition language set to: ${selectedLanguage}`, false);
+    });
+    
+    // Function to speak text using the selected TTS provider
     async function speakText(text) {
       try {
         // Check if TTS is enabled
@@ -639,18 +700,45 @@
     }
 
     // Add back n8n settings form submit handler
-    n8nSettingsForm.addEventListener('submit', (e) => {
+    n8nSettingsForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const settings = {
-        url: document.getElementById('webhook-url').value
-      };
+      const webhookUrl = document.getElementById('webhook-url').value;
+      const googleApiKey = document.getElementById('google-api-key').value;
+      const elevenLabsApiKey = document.getElementById('elevenlabs-api-key').value;
+      const speechLanguage = document.getElementById('speech-language').value;
       
       // Save settings locally
-      localStorage.setItem('n8nSettings', JSON.stringify(settings));
+      localStorage.setItem('n8nSettings', JSON.stringify({
+        url: webhookUrl
+      }));
+      
+      // Save speech recognition settings
+      localStorage.setItem('speechRecognitionSettings', JSON.stringify({
+        useElevenLabsSTT: useElevenLabsToggle.checked,
+        language: speechLanguage
+      }));
+      
+      // Save API keys to electron store
+      try {
+        if (googleApiKey) {
+          await window.electronAPI.setApiKey('google', googleApiKey);
+        }
+        
+        if (elevenLabsApiKey) {
+          await window.electronAPI.setApiKey('elevenlabs', elevenLabsApiKey);
+        }
+        
+        // Save speech language to electron store
+        await window.electronAPI.setSpeechRecognitionLanguage(speechLanguage);
+        
+        console.log(`Saving speech language: ${speechLanguage}`);
+      } catch (error) {
+        console.error('Error saving settings:', error);
+      }
       
       // Remove no-webhook indicator if webhook is set
-      if (settings.url) {
+      if (webhookUrl) {
         statusIndicator.classList.remove('no-webhook');
       }
       
@@ -658,7 +746,7 @@
       settingsModal.style.display = 'none';
       
       // Show success message
-      addMessage('n8n settings saved successfully. Your chat is now connected to your workflow.', false);
+      addMessage('Settings saved successfully. Your chat is now connected.', false);
     });
 
     // Make window draggable
